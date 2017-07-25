@@ -23,6 +23,7 @@ import static com.android.internal.R.integer.config_defaultMinEmergencyGestureTa
 
 import android.app.ActivityManager;
 import android.app.ActivityOptions;
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
@@ -32,6 +33,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.ContentObserver;
+import android.ext.settings.ExtSettings;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -844,6 +846,11 @@ public class GestureLauncherService extends SystemService {
     boolean handleCameraGesture(boolean useWakelock, int source) {
         Trace.traceBegin(Trace.TRACE_TAG_ACTIVITY_MANAGER, "GestureLauncher:handleCameraGesture");
         try {
+            if (!ExtSettings.ALLOW_KEYGUARD_CAMERA.get(mContext)) {
+                if (mContext.getSystemService(KeyguardManager.class).isKeyguardLocked()) {
+                    return false;
+                }
+            }
             boolean userSetupComplete = isUserSetupComplete();
             if (!userSetupComplete) {
                 if (DBG) {
