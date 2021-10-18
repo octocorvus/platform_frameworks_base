@@ -6214,6 +6214,17 @@ public class SettingsProvider extends ContentProvider {
                                 true,
                                 SettingsState.SYSTEM_PACKAGE_NAME);
                     }
+                    // Migrate legacy fingerprint_unlock_keyguard_enabled setting
+                    final Setting oldFingerSetting = secureSettings.getSettingLocked("fingerprint_unlock_keyguard_enabled");
+                    if (!oldFingerSetting.isNull()) {
+                        secureSettings.insertSettingLocked(
+                                Secure.FINGERPRINT_KEYGUARD_ENABLED,
+                                oldFingerSetting.getValue(),
+                                null,
+                                false,
+                                SettingsState.SYSTEM_PACKAGE_NAME);
+                        secureSettings.deleteSettingLocked("fingerprint_unlock_keyguard_enabled");
+                    }
                     currentVersion = 206;
                 }
 
