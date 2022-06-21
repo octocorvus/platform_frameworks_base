@@ -30,6 +30,7 @@ import com.android.systemui.qs.pipeline.shared.TileSpec
 import com.android.systemui.qs.shared.model.TileCategory
 import com.android.systemui.qs.tileimpl.QSTileImpl
 import com.android.systemui.qs.tiles.AlarmTile
+import com.android.systemui.qs.tiles.BatteryShareTile
 import com.android.systemui.qs.tiles.CameraToggleTile
 import com.android.systemui.qs.tiles.FlashlightTile
 import com.android.systemui.qs.tiles.FlashlightTileWithLevel
@@ -488,6 +489,21 @@ interface PolicyModule {
         ): QSTileImpl<*> {
             return if (FlashlightStrength.isEnabled) levelTile.get() else binaryTile.get()
         }
+
+        @Provides
+        @IntoMap
+        @StringKey(BatteryShareTile.TILE_SPEC)
+        fun provideBatteryShareTileConfig(uiEventLogger: QsEventLogger): QSTileConfig =
+            QSTileConfig(
+                tileSpec = TileSpec.create(BatteryShareTile.TILE_SPEC),
+                uiConfig =
+                    QSTileUIConfig.Resource(
+                        iconRes = R.drawable.ic_battery_share,
+                        labelRes = R.string.battery_share_switch_title,
+                    ),
+                instanceId = uiEventLogger.getNewInstanceId(),
+                category = TileCategory.UTILITIES,
+            )
     }
 
     /** Inject LocationTile into tileMap in QSModule */
@@ -518,4 +534,9 @@ interface PolicyModule {
     @IntoMap
     @StringKey(UiModeNightTile.TILE_SPEC)
     fun bindUiModeNightTile(uiModeNightTile: UiModeNightTile): QSTileImpl<*>
+
+    @Binds
+    @IntoMap
+    @StringKey(BatteryShareTile.TILE_SPEC)
+    fun bindBatteryShareTile(batteryShareTile: BatteryShareTile): QSTileImpl<*>
 }
