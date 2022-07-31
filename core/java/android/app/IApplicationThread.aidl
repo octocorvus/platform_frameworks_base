@@ -190,4 +190,6 @@ oneway interface IApplicationThread {
     void getExecutableMethodFileOffsets(in MethodDescriptor methodDescriptor,
             in IOffsetCallback resultCallback);
     void requestHandoffActivityData(in IBinder requestToken, in List<IBinder> activityTokens);
+
+    void onGosPackageStateChanged(in android.content.pm.GosPackageState state);
 }

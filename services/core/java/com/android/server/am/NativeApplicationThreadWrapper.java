@@ -39,6 +39,7 @@ import android.content.IIntentReceiver;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.GosPackageState;
 import android.content.pm.PackageManager;
 import android.content.pm.ParceledListSlice;
 import android.content.pm.ProviderInfo;
@@ -465,4 +466,9 @@ public class NativeApplicationThreadWrapper extends IApplicationThread.Stub {
 
     @Override
     public void requestHandoffActivityData(IBinder requestToken, List<IBinder> activityTokens) {}
+
+    @Override
+    public void onGosPackageStateChanged(GosPackageState state) throws RemoteException {
+        // TODO: implement this
+    }
 }
