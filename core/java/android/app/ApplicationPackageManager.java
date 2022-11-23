@@ -4372,4 +4372,13 @@ public class ApplicationPackageManager extends PackageManager {
         }
         sQueryIntentActivitiesCache.invalidateCache();
     }
+
+    @UnsupportedAppUsage
+    public PackageInfo findPackage(String packageName, long minVersion, Bundle validSignaturesSha256) {
+        try {
+            return mPM.findPackage(packageName, minVersion, validSignaturesSha256);
+        } catch (RemoteException e) {
+            throw e.rethrowAsRuntimeException();
+        }
+    }
 }
