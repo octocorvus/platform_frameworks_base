@@ -42,6 +42,16 @@ public class ExtSettings {
     public static final BoolSetting SCREENSHOT_TIMESTAMP_EXIF = new BoolSetting(
             Setting.Scope.PER_USER, Settings.Secure.SCREENSHOT_TIMESTAMP_EXIF, false);
 
+    public static final BoolSetting SCRAMBLE_LOCKSCREEN_PIN_LAYOUT_PRIMARY = new BoolSetting(
+            Setting.Scope.PER_USER, Settings.Secure.SCRAMBLE_PIN_LAYOUT_PRIMARY, false);
+    public static final BoolSetting SCRAMBLE_LOCKSCREEN_PIN_LAYOUT_SECONDARY = new BoolSetting(
+            Setting.Scope.PER_USER, Settings.Secure.SCRAMBLE_PIN_LAYOUT_SECONDARY, false);
+
+    public static final BoolSetting SCRAMBLE_SIM_PIN_LAYOUT = new BoolSetting(
+            Setting.Scope.PER_USER, Settings.Secure.SCRAMBLE_SIM_PIN_LAYOUT,
+            // inherit lockscreen PIN setting by default
+            SCRAMBLE_LOCKSCREEN_PIN_LAYOUT_PRIMARY::get);
+
     // AppCompatConfig specifies which hardening features are compatible/incompatible with a
     // specific app.
     // This setting controls whether incompatible hardening features would be disabled by default

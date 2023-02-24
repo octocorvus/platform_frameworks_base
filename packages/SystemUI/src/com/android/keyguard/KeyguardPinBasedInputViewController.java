@@ -19,9 +19,13 @@ package com.android.keyguard;
 import static android.view.accessibility.AccessibilityEvent.TYPE_VIEW_FOCUSED;
 
 import static com.android.internal.widget.flags.Flags.hideLastCharWithPhysicalInput;
+import static com.android.keyguard.KeyguardSecurityModel.SecurityMode.BiometricSecondFactorPin;
 import static com.android.systemui.Flags.pinInputFieldStyledFocusState;
 import static com.android.systemui.util.kotlin.JavaAdapterKt.collectFlow;
 
+import android.content.Context;
+import android.ext.settings.BoolSetting;
+import android.ext.settings.ExtSettings;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.StateListDrawable;
@@ -94,6 +98,18 @@ public abstract class KeyguardPinBasedInputViewController<T extends KeyguardPinB
         mPasswordEntry = mView.findViewById(mView.getPasswordTextViewId());
         mInputManager = inputManager;
         mShowAnimations = null;
+
+        Context ctx = view.getContext().getApplicationContext();
+        int userId = mSelectedUserInteractor.getSelectedUserId();
+        BoolSetting setting;
+        if (this instanceof KeyguardPinViewController) {
+            setting = securityMode == BiometricSecondFactorPin ?
+                    ExtSettings.SCRAMBLE_LOCKSCREEN_PIN_LAYOUT_SECONDARY :
+                    ExtSettings.SCRAMBLE_LOCKSCREEN_PIN_LAYOUT_PRIMARY;
+        } else {
+            setting = ExtSettings.SCRAMBLE_SIM_PIN_LAYOUT;
+        }
+        view.setupPinScrambling(setting.get(ctx, userId));
     }
 
     private void updateAnimations(Boolean showAnimations) {
