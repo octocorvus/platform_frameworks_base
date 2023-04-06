@@ -7765,4 +7765,9 @@
         It can only contain non-AOSP permissions outside of the android.*
         and com.android.* namespace. -->
     <string-array name="config_watchFacePermissions" translatable="false"/>
+
+    <bool name="config_Google_apps_can_have_special_access_to_accelerators">false</bool>
+    <java-symbol type="bool" name="config_Google_apps_can_have_special_access_to_accelerators" />
+    <bool name="config_GoogleCamera_needs_seinfo_for_access_to_accelerators">false</bool>
+    <java-symbol type="bool" name="config_GoogleCamera_needs_seinfo_for_access_to_accelerators" />
 </resources>
