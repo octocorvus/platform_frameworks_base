@@ -38,6 +38,7 @@ import android.annotation.StringRes;
 import android.annotation.UserIdInt;
 import android.annotation.XmlRes;
 import android.app.admin.DevicePolicyManager;
+import android.app.compat.gms.GmsCompat;
 import android.app.role.RoleManager;
 import android.compat.annotation.UnsupportedAppUsage;
 import android.content.ComponentName;
@@ -133,6 +134,7 @@ import android.window.DesktopExperienceFlags;
 
 import com.android.internal.annotations.GuardedBy;
 import com.android.internal.annotations.VisibleForTesting;
+import com.android.internal.gmscompat.sysservice.GmcPackageManager;
 import com.android.internal.os.SomeArgs;
 import com.android.internal.pm.RoSystemFeatures;
 import com.android.internal.util.UserIcons;
@@ -281,6 +283,7 @@ public class ApplicationPackageManager extends PackageManager {
         if (pi == null) {
             throw new NameNotFoundException(packageName);
         }
+        GmcPackageManager.maybeAdjustPackageInfo(pi);
         return pi;
     }
 
@@ -542,6 +545,9 @@ public class ApplicationPackageManager extends PackageManager {
         if (ai == null) {
             throw new NameNotFoundException(packageName);
         }
+
+        GmcPackageManager.maybeAdjustApplicationInfo(ai);
+
         return maybeAdjustApplicationInfo(ai);
     }
 
@@ -1788,12 +1794,17 @@ public class ApplicationPackageManager extends PackageManager {
     @Override
     public ProviderInfo resolveContentProviderAsUser(String name, ComponentInfoFlags flags,
             int userId) {
+        ProviderInfo res;
         try {
-            return mPM.resolveContentProvider(name,
+            res = mPM.resolveContentProvider(name,
                     updateFlagsForComponent(flags.getValue(), userId, null), userId);
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
         }
+        if (res != null && res.applicationInfo != null && "com.google.android.gms.chimera".equals(name)) {
+            GmcPackageManager.maybeAdjustApplicationInfo(res.applicationInfo);
+        }
+        return res;
     }
 
     /** @hide **/
@@ -2269,8 +2280,8 @@ public class ApplicationPackageManager extends PackageManager {
     }
 
     @UnsupportedAppUsage
-    protected ApplicationPackageManager(ContextImpl context, IPackageManager pm) {
-        mContext = context;
+    protected ApplicationPackageManager(Context context, IPackageManager pm) {
+        mContext = (ContextImpl) context;
         mPM = pm;
         mUseSystemFeaturesCache = isSystemFeaturesCacheAvailable();
     }
