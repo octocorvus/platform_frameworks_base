@@ -1108,15 +1108,7 @@ public class LockPatternUtils {
      * @return Whether enhanced pin privacy is enabled.
      */
     public boolean isPinEnhancedPrivacyEnabled(int userId) {
-        boolean defaultValue = false;
-        if (enableDefaultVisibilityForSensitiveInputs()) {
-            defaultValue =
-                    mContext.getResources()
-                            .getBoolean(
-                                    com.android.internal.R.bool
-                                            .config_lockPinEnhancedPrivacyDefault);
-        }
-        return getBoolean(LOCK_PIN_ENHANCED_PRIVACY, defaultValue, userId);
+        return getBoolean(LOCK_PIN_ENHANCED_PRIVACY, true, userId);
     }
 
     /**

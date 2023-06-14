@@ -583,14 +583,16 @@ public class LockPatternUtilsTest {
         when(mResources.getBoolean(
                         com.android.internal.R.bool.config_lockPinEnhancedPrivacyDefault))
                 .thenReturn(false);
-        assertFalse(mLockPatternUtils.isPinEnhancedPrivacyEnabled(USER_ID));
+        // GrapheneOS change: PIN enhanced privacy defaults to true, regardless of config
+        assertTrue(mLockPatternUtils.isPinEnhancedPrivacyEnabled(USER_ID));
     }
 
     @Test
     @DisableFlags(Flags.FLAG_ENABLE_DEFAULT_VISIBILITY_FOR_SENSITIVE_INPUTS)
     public void isPinEnhancedPrivacyEnabled_OldDefault() throws RemoteException {
         configureSensitiveInputVisibilityTest();
-        assertFalse(mLockPatternUtils.isPinEnhancedPrivacyEnabled(USER_ID));
+        // GrapheneOS change: PIN enhanced privacy defaults to true, regardless of config
+        assertTrue(mLockPatternUtils.isPinEnhancedPrivacyEnabled(USER_ID));
     }
 
     private static ParcelDuration asParcel(Duration duration) {
