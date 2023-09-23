@@ -361,7 +361,8 @@ public class ZygoteProcess {
                                                   boolean bindMountAppStorageDirs,
                                                   boolean bindOverrideSysprops,
                                                   long startSeq,
-                                                  @Nullable String[] zygoteArgs) {
+                                                  @Nullable String[] zygoteArgs,
+                                                  @Nullable String flatExtraArgs) {
         // TODO (chriswailes): Is there a better place to check this value?
         if (fetchUsapPoolEnabledPropWithMinInterval()) {
             informZygotesOfUsapPoolStatus();
@@ -373,7 +374,7 @@ public class ZygoteProcess {
                     abi, instructionSet, appDataDir, invokeWith, /*startChildZygote=*/ false,
                     packageName, zygotePolicyFlags, isTopApp, disabledCompatChanges,
                     pkgDataInfoMap, allowlistedDataInfoList, bindMountAppsData,
-                    bindMountAppStorageDirs, bindOverrideSysprops, startSeq, zygoteArgs);
+                    bindMountAppStorageDirs, bindOverrideSysprops, startSeq, zygoteArgs, flatExtraArgs);
         } catch (ZygoteStartFailedEx ex) {
             Log.e(LOG_TAG,
                     "Starting VM process through Zygote failed");
@@ -653,7 +654,8 @@ public class ZygoteProcess {
                                                       boolean bindMountAppStorageDirs,
                                                       boolean bindMountOverrideSysprops,
                                                       long startSeq,
-                                                      @Nullable String[] extraArgs)
+                                                      @Nullable String[] extraArgs,
+                                                      @Nullable String flatExtraArgs)
                                                       throws ZygoteStartFailedEx {
         if (Flags.nativeFrameworkPrototype()
                 && (zygotePolicyFlags & ZYGOTE_POLICY_FLAG_NATIVE_PROCESS) != 0) {
@@ -800,6 +802,10 @@ public class ZygoteProcess {
             }
 
             argsForZygote.add(sb.toString());
+        }
+
+        if (flatExtraArgs != null) {
+            argsForZygote.add(flatExtraArgs);
         }
 
         argsForZygote.add(processClass);
@@ -1314,7 +1320,8 @@ public class ZygoteProcess {
                                                String acceptedAbiList,
                                                String instructionSet,
                                                int uidRangeStart,
-                                               int uidRangeEnd) {
+                                               int uidRangeEnd,
+                                               @Nullable String flatExtraArgs) {
         // Create an unguessable address in the global abstract namespace.
         final LocalSocketAddress serverAddress = new LocalSocketAddress(
                 processClass + "/" + UUID.randomUUID().toString());
@@ -1336,7 +1343,7 @@ public class ZygoteProcess {
                     null /* disabledCompatChanges */, null /* pkgDataInfoMap */,
                     null /* allowlistedDataInfoList */, true /* bindMountAppsData*/,
                     /* bindMountAppStorageDirs */ false, /*bindMountOverrideSysprops */ false,
-                    /* startSeq */ 0, extraArgs);
+                    /* startSeq */ 0, extraArgs, flatExtraArgs);
 
         } catch (ZygoteStartFailedEx ex) {
             throw new RuntimeException("Starting child-zygote through Zygote failed", ex);
