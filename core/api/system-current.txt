@@ -5051,6 +5051,15 @@ package android.ext.cscopes {
 
 }
 
+package android.ext.dcl {
+
+  public class DynCodeLoading {
+    method public static void checkDexFileOpen(int, @NonNull String) throws java.lang.Exception;
+    method public static void checkInMemoryDexFileOpen(int);
+  }
+
+}
+
 package android.ext.settings {
 
   public class BoolSetting extends android.ext.settings.Setting<android.ext.settings.BoolSetting> {

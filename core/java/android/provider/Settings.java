@@ -13517,6 +13517,18 @@ public final class Settings {
 
         /** @hide */
         @Protected(readWrite = KnownSystemPackage.SETTINGS)
+        public static final String RESTRICT_MEMORY_DYN_CODE_LOADING_BY_DEFAULT = "restrict_memory_dyn_code_exec";
+
+        /** @hide */
+        @Protected(readWrite = KnownSystemPackage.SETTINGS)
+        public static final String RESTRICT_STORAGE_DYN_CODE_LOADING_BY_DEFAULT = "restrict_storage_dyn_code_exec";
+
+        /** @hide */
+        @Protected(readWrite = KnownSystemPackage.SETTINGS)
+        public static final String RESTRICT_WEBVIEW_DYN_CODE_LOADING_BY_DEFAULT = "restrict_webview_dyn_code_exec";
+
+        /** @hide */
+        @Protected(readWrite = KnownSystemPackage.SETTINGS)
         public static final String SHOW_SYSTEM_PROCESS_CRASH_NOTIFICATIONS = "show_system_process_crash_notifs";
 
         // ExtSettings END
