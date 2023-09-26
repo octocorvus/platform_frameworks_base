@@ -94,6 +94,8 @@ import android.content.pm.IPackageManager;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManagerInternal;
 import android.content.res.Resources;
+import android.ext.settings.app.AswUseExtendedVaSpace;
+import android.ext.settings.app.AswUseHardenedMalloc;
 import android.graphics.Point;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
@@ -2109,6 +2111,14 @@ public final class ProcessList {
                 GosPackageState ps = pmi.getGosPackageState(definingAppInfo.packageName, userId);
 
                 flatExtraArgs = ZygoteExtraArgs.createFlat(ctx, userId, definingAppInfo, ps, app.isolated);
+
+                if (!AswUseHardenedMalloc.I.get(ctx, userId, definingAppInfo, ps)) {
+                    runtimeFlags |= Zygote.DISABLE_HARDENED_MALLOC;
+                }
+
+                if (!AswUseExtendedVaSpace.I.get(ctx, userId, definingAppInfo, ps)) {
+                    runtimeFlags |= Zygote.ENABLE_COMPAT_VA_39_BIT;
+                }
             }
 
             // the per-user SELinux context must be set
