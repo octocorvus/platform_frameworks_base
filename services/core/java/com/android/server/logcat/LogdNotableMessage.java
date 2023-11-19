@@ -4,7 +4,7 @@ import android.app.ActivityManagerInternal;
 import android.app.ActivityManagerInternal.ProcessRecordSnapshot;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.GosPackageState;
+import android.content.pm.GosPackageStateFlag;
 import android.ext.SettingsIntents;
 import android.util.Slog;
 
@@ -115,6 +115,21 @@ public class LogdNotableMessage {
             return;
         }
 
-        Slog.w(TAG, "unknown flag " + msg);
+        ApplicationInfo appInfo = prs.appInfo;
+
+        if (flagValue == SELinuxFlags.DENY_PROCESS_PTRACE) {
+            if (appInfo.ext().hasCompatChange(AppCompatProtos.SUPPRESS_NATIVE_DEBUGGING_NOTIFICATION)) {
+                Slog.d(TAG, "ptrace notification is disabled by compat change for " + appInfo.packageName);
+                return;
+            }
+
+            var n = AppSwitchNotification.create(ctx, appInfo, SettingsIntents.APP_NATIVE_DEBUGGING);
+            n.titleRes = R.string.notif_native_debug_title;
+            n.gosPsFlagSuppressNotif = GosPackageStateFlag.BLOCK_NATIVE_DEBUGGING_SUPPRESS_NOTIF;
+            n.maybeShow();
+        }
+        else {
+            Slog.w(TAG, "unknown flag " + msg);
+        }
     }
 }
