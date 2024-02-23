@@ -237,4 +237,6 @@ interface IUsbManager
     /* Enable/disable PCI tunnels for USB4 and Thunderbolt connections. */
     @EnforcePermission("MANAGE_USB")
     void enablePciTunnels(boolean enable);
+
+    void updatePortSecuritySetting(int newValue);
 }
