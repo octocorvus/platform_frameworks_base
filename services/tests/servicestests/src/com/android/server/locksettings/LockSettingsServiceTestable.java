@@ -199,6 +199,13 @@ public class LockSettingsServiceTestable extends LockSettingsService {
         public void invalidateLockoutEndTimeCache() {
             mInvalidateLockoutEndTimeCacheMock.run();
         }
+
+        @Override
+        public DuressPasswordHelper getDuressPasswordHelper(LockSettingsService lockSettingsService,
+                LockSettingsStorage lockSettingsStorage,
+                SyntheticPasswordManager syntheticPasswordManager) {
+            return mock(DuressPasswordHelper.class);
+        }
     }
 
     protected LockSettingsServiceTestable(
