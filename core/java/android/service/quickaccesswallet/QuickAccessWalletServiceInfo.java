@@ -51,6 +51,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * {@link ServiceInfo} and meta-data about a {@link QuickAccessWalletService}.
@@ -165,6 +166,7 @@ class QuickAccessWalletServiceInfo {
 
     private static ServiceInfo getWalletServiceInfo(Context context, String packageName,
             int userId) {
+        Objects.requireNonNull(packageName);
         Intent intent = new Intent(QuickAccessWalletService.SERVICE_INTERFACE);
         intent.setPackage(packageName);
         List<ResolveInfo> resolveInfos =
