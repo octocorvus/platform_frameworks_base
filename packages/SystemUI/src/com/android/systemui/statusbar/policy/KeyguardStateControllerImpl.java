@@ -17,7 +17,7 @@
 package com.android.systemui.statusbar.policy;
 
 import static android.hardware.biometrics.BiometricSourceType.FACE;
-
+import static com.android.keyguard.KeyguardUpdateMonitorCallback.SecondFactorStatus.Disabled;
 import static com.android.systemui.flags.Flags.LOCKSCREEN_ENABLE_LANDSCAPE;
 
 import android.annotation.NonNull;
@@ -462,9 +462,10 @@ public class KeyguardStateControllerImpl implements KeyguardStateController {
 
         @Override
         public void onBiometricAuthenticated(int userId, BiometricSourceType biometricSourceType,
-                boolean isStrongBiometric) {
+                boolean isStrongBiometric, SecondFactorStatus secondFactorStatus) {
             Trace.beginSection("KeyguardUpdateMonitorCallback#onBiometricAuthenticated");
-            if (mKeyguardUpdateMonitor.isUnlockingWithBiometricAllowed(isStrongBiometric)) {
+            if (mKeyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(isStrongBiometric) &&
+                    secondFactorStatus == Disabled) {
                 update(false /* updateAlways */);
             }
             Trace.endSection();
