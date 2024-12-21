@@ -160,7 +160,8 @@ public abstract class KeyguardPinBasedInputViewController<T extends KeyguardPinB
         super.onViewAttached();
 
         boolean showAnimations = !mLockPatternUtils
-                .isPinEnhancedPrivacyEnabled(mSelectedUserInteractor.getSelectedUserId());
+                .isPinEnhancedPrivacyEnabled(mSelectedUserInteractor.getSelectedUserId(),
+                        mLockDomain);
         if (hideLastCharWithPhysicalInput()) {
             mInputManager.registerInputDeviceListener(this, null);
             updateAnimations(showAnimations);

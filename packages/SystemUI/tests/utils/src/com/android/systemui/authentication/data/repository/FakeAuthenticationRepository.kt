@@ -221,6 +221,9 @@ class FakeAuthenticationRepository(private val currentTime: () -> Long) : Authen
                 is AuthenticationMethodModel.Pattern -> SecurityMode.Pattern
                 is AuthenticationMethodModel.None -> SecurityMode.None
                 is AuthenticationMethodModel.Sim -> SecurityMode.SimPin
+                is AuthenticationMethodModel.BiometricSecondFactorPin ->
+                    SecurityMode.BiometricSecondFactorPin
+                else -> SecurityMode.Invalid
             }
         }
 

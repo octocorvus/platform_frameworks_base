@@ -43,6 +43,10 @@ sealed class AuthenticationMethodModel(
 
     data object Sim : AuthenticationMethodModel(isSecure = true)
 
+    // TODO: Add this to all relevant parts of the code. Currently only using this for bouncer
+    //  messages. Easiest to look at all places where Pin is used and make appropriate changes.
+    data object BiometricSecondFactorPin : AuthenticationMethodModel(isSecure = true)
+
     override fun logDiffs(prevVal: AuthenticationMethodModel, row: TableRowLogger) {
         row.logChange(columnName = "authenticationMethod", value = toString())
     }

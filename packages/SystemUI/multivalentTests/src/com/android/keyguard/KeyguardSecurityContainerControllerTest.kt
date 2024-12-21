@@ -110,6 +110,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.reset
 import org.mockito.Mockito.spy
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 
@@ -321,6 +322,15 @@ class KeyguardSecurityContainerControllerTest : SysuiTestCase() {
                 verify(viewFlipperController).getSecurityView(eq(mode), any(), any())
             }
         }
+    }
+
+    @Test
+    fun showSecurityScreen_previousBiometricSecondFactorPin_clearsHardwareAuthTokens() {
+        underTest.showSecurityScreen(SecurityMode.BiometricSecondFactorPin)
+
+        underTest.showSecurityScreen(SecurityMode.PIN)
+
+        verify(keyguardUpdateMonitor).clearFingerprintRecognized()
     }
 
     @Test
@@ -638,6 +648,24 @@ class KeyguardSecurityContainerControllerTest : SysuiTestCase() {
 
         // THEN we will show the SIM PIN screen
         verify(viewFlipperController).getSecurityView(eq(SecurityMode.SimPin), any(), any())
+    }
+
+    @Test
+    fun showNextSecurityScreenOrFinish_BiometricUnlockedWithSecondFactorEnabled_DoesNotFinish() {
+        whenever(keyguardUpdateMonitor.forceIsDismissibleIsKeepingDeviceUnlocked()).thenReturn(false)
+        whenever(keyguardUpdateMonitor.getUserHasTrust(TARGET_USER_ID)).thenReturn(false)
+        whenever(lockPatternUtils.isBiometricSecondFactorEnabled(TARGET_USER_ID)).thenReturn(true)
+
+        underTest.showSecurityScreen(SecurityMode.Password)
+
+        val finish = underTest.showNextSecurityScreenOrFinish(
+                /* authenticated= */ false,
+                TARGET_USER_ID,
+                /* bypassSecondaryLockScreen= */ true,
+                SecurityMode.Password
+        )
+
+        Assert.assertFalse(finish)
     }
 
     @Test
