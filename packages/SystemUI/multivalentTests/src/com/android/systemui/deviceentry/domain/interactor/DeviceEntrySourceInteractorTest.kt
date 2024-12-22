@@ -79,7 +79,7 @@ class DeviceEntrySourceInteractorTest : SysuiTestCase() {
             if (SceneContainerFlag.isEnabled) {
                 whenever(authController.isUdfpsFingerDown).thenReturn(false)
                 whenever(dozeScrimController.isPulsing).thenReturn(false)
-                whenever(keyguardUpdateMonitor.isUnlockingWithBiometricAllowed(anyBoolean()))
+                whenever(keyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(anyBoolean()))
                     .thenReturn(true)
                 whenever(screenOffAnimationController.isKeyguardShowDelayed()).thenReturn(false)
                 fakeAuthenticationRepository.setAuthenticationMethod(AuthenticationMethodModel.Pin)

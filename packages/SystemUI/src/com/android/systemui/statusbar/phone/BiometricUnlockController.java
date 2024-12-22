@@ -603,7 +603,7 @@ public class BiometricUnlockController extends KeyguardUpdateMonitorCallback imp
     public boolean hasPendingAuthentication() {
         return mPendingAuthenticated != null
                 && mUpdateMonitor
-                    .isUnlockingWithBiometricAllowed(mPendingAuthenticated.isStrongBiometric)
+                    .isUnlockingWithBiometricAllowedSafe(mPendingAuthenticated.isStrongBiometric)
                 && mPendingAuthenticated.userId
                     == mSelectedUserInteractor.get().getSelectedUserId();
     }

@@ -81,13 +81,13 @@ class DeviceEntryHapticsInteractorTest : SysuiTestCase() {
         if (SceneContainerFlag.isEnabled) {
             whenever(kosmos.authController.isUdfpsFingerDown).thenReturn(false)
             whenever(kosmos.dozeScrimController.isPulsing).thenReturn(false)
-            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowed(anyBoolean()))
+            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(anyBoolean()))
                 .thenReturn(true)
             whenever(kosmos.screenOffAnimationController.isKeyguardShowDelayed()).thenReturn(false)
 
             // Dependencies for DeviceEntrySourceInteractor#biometricUnlockStateOnKeyguardDismissed
             whenever(kosmos.keyguardUpdateMonitor.isDeviceInteractive).thenReturn(true)
-            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowed(anyBoolean()))
+            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(anyBoolean()))
                 .thenReturn(true)
 
             // Mock authenticationMethodIsSecure true

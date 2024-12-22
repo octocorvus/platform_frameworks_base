@@ -294,7 +294,7 @@ class DeviceEntrySideFpsOverlayInteractorTest : SysuiTestCase() {
         val primaryStartDisappearAnimation = if (isAnimatingAway) Runnable {} else null
         bouncerRepository.setPrimaryStartDisappearAnimation(primaryStartDisappearAnimation)
 
-        updateBouncer(isShowing && !isAnimatingAway, fpsDetectionRunning, isUnlockingWithFpAllowed)
+        updateBouncer(isShowing && !isAnimatingAway, fpsDetectionRunning, isUnlockingWithFpAllowedSafe)
     }
 
     private fun TestScope.updateBouncer(
@@ -310,7 +310,7 @@ class DeviceEntrySideFpsOverlayInteractorTest : SysuiTestCase() {
 
         whenever(keyguardUpdateMonitor.isFingerprintDetectionRunning)
             .thenReturn(fpsDetectionRunning)
-        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowed)
+        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowedSafe)
             .thenReturn(isUnlockingWithFpAllowed)
         mContext.orCreateTestableResources.addOverride(
             R.bool.config_show_sidefps_hint_on_bouncer,
