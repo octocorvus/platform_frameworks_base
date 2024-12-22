@@ -341,7 +341,7 @@ class DeviceEntrySideFpsOverlayInteractorTest : SysuiTestCase() {
 
         whenever(keyguardUpdateMonitor.isFingerprintDetectionRunning)
             .thenReturn(fpsDetectionRunning)
-        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowed)
+        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowedSafe)
             .thenReturn(isUnlockingWithFpAllowed)
         mContext.orCreateTestableResources.addOverride(
             R.bool.config_show_sidefps_hint_on_bouncer,
@@ -362,7 +362,7 @@ class DeviceEntrySideFpsOverlayInteractorTest : SysuiTestCase() {
 
         whenever(keyguardUpdateMonitor.isFingerprintDetectionRunning)
             .thenReturn(fpsDetectionRunning)
-        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowed)
+        whenever(keyguardUpdateMonitor.isUnlockingWithFingerprintAllowedSafe)
             .thenReturn(isUnlockingWithFpAllowed)
         mContext.orCreateTestableResources.addOverride(
             R.bool.config_show_sidefps_hint_on_bouncer,

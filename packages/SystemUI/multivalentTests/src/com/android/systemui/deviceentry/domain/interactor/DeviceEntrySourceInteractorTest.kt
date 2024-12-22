@@ -74,7 +74,7 @@ class DeviceEntrySourceInteractorTest : SysuiTestCase() {
         if (SceneContainerFlag.isEnabled) {
             whenever(kosmos.authController.isUdfpsFingerDown).thenReturn(false)
             whenever(kosmos.dozeScrimController.isPulsing).thenReturn(false)
-            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowed(anyBoolean()))
+            whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(anyBoolean()))
                 .thenReturn(true)
             whenever(kosmos.screenOffAnimationController.isKeyguardShowDelayed()).thenReturn(false)
             kosmos.fakeAuthenticationRepository.setAuthenticationMethod(

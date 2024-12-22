@@ -214,7 +214,7 @@ internal fun updatePrimaryBouncer(
 
     whenever(kosmos.keyguardUpdateMonitor.isFingerprintDetectionRunning)
         .thenReturn(fpsDetectionRunning)
-    whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithFingerprintAllowed)
+    whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithFingerprintAllowedSafe)
         .thenReturn(isUnlockingWithFpAllowed)
     mContext.orCreateTestableResources.addOverride(R.bool.config_show_sidefps_hint_on_bouncer, true)
 }

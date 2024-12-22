@@ -179,7 +179,7 @@ class SceneContainerStartableTest : SysuiTestCase() {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowed(anyBoolean()))
+        whenever(kosmos.keyguardUpdateMonitor.isUnlockingWithBiometricAllowedSafe(anyBoolean()))
             .thenReturn(true)
         kosmos.activityTransitionAnimator = mockActivityTransitionAnimator
 
