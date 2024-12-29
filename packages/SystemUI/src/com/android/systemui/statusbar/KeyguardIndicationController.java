@@ -31,6 +31,7 @@ import static android.view.View.VISIBLE;
 import static com.android.keyguard.KeyguardUpdateMonitor.BIOMETRIC_HELP_FACE_NOT_AVAILABLE;
 import static com.android.keyguard.KeyguardUpdateMonitor.BIOMETRIC_HELP_FACE_NOT_RECOGNIZED;
 import static com.android.keyguard.KeyguardUpdateMonitor.BIOMETRIC_HELP_FINGERPRINT_NOT_RECOGNIZED;
+import static com.android.settingslib.fuelgauge.BatteryUtils.isChargingStringV2Enabled;
 import static com.android.systemui.DejankUtils.whitelistIpcs;
 import static com.android.systemui.keyguard.KeyguardIndicationRotateTextViewController.IMPORTANT_MSG_MIN_DURATION;
 import static com.android.systemui.keyguard.KeyguardIndicationRotateTextViewController.INDICATION_IS_DISMISSIBLE;
@@ -49,6 +50,7 @@ import static com.android.systemui.keyguard.ScreenLifecycle.SCREEN_ON;
 import static com.android.systemui.log.core.LogLevel.ERROR;
 import static com.android.systemui.plugins.FalsingManager.LOW_PENALTY;
 import static com.android.systemui.util.kotlin.JavaAdapterKt.collectFlow;
+import static android.ext.power.BatteryChargeLimit.CHARGE_LEVEL;
 
 import android.app.AlarmManager;
 import android.app.admin.DevicePolicyManager;
@@ -59,6 +61,7 @@ import android.content.IntentFilter;
 import android.content.pm.UserInfo;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.ext.power.BatteryChargeLimit;
 import android.graphics.Color;
 import android.hardware.biometrics.BiometricSourceType;
 import android.os.BatteryManager;
@@ -88,6 +91,7 @@ import com.android.keyguard.TrustGrantFlags;
 import com.android.keyguard.logging.KeyguardLogger;
 import com.android.settingslib.Utils;
 import com.android.settingslib.fuelgauge.BatteryStatus;
+import com.android.settingslib.utils.PowerUtil;
 import com.android.systemui.Flags;
 import com.android.systemui.biometrics.AuthController;
 import com.android.systemui.biometrics.FaceHelpMessageDeferral;
@@ -1130,6 +1134,29 @@ public class KeyguardIndicationController {
     }
 
     protected String computePowerChargingStringIndication() {
+        Context context = mContext;
+        if (BatteryChargeLimit.isChargeLimitEnabled(context)) {
+            String percentage = NumberFormat.getPercentInstance().format(mBatteryLevel / 100f);
+
+            if (mChargingTimeRemaining > 0 && mBatteryLevel < CHARGE_LEVEL) {
+                if (isChargingStringV2Enabled()) {
+                    String remainingTime = PowerUtil.getTargetTimeShortString(
+                            context, mChargingTimeRemaining, System.currentTimeMillis());
+                    return context.getString(R.string.keyguard_indication_charging_time_charge_limit,
+                            remainingTime, percentage);
+                } else {
+                    String remainingTime = Formatter.formatShortElapsedTimeRoundingUpToMinutes(
+                            context, mChargingTimeRemaining);
+                    return context.getString(R.string.keyguard_indication_charging_time_charge_limit_v1,
+                            remainingTime, percentage);
+                }
+            }
+            if (mBatteryLevel >= CHARGE_LEVEL) {
+                return context.getString(R.string.keyguard_indication_charging_time_reach_charge_limit,
+                        percentage);
+            }
+        }
+
         if (mPowerCharged) {
             return mContext.getResources().getString(R.string.keyguard_charged);
         }
@@ -1596,12 +1623,21 @@ public class KeyguardIndicationController {
 
     /** Return true if the device is under the battery defender mode. */
     protected boolean isBatteryDefender(BatteryStatus status) {
+        if (BatteryChargeLimit.isChargeLimitEnabled(mContext)) {
+            return false;
+        }
         return status.isBatteryDefender();
     }
 
     /** Return true if the device has power plugged in. */
     protected boolean isPowerPluggedIn(BatteryStatus status, boolean isChargingOrFull) {
-        return status.isPluggedIn() && isChargingOrFull;
+        if (!status.isPluggedIn()) {
+            return false;
+        }
+        if (status.level >= BatteryChargeLimit.CHARGE_LEVEL && BatteryChargeLimit.isChargeLimitEnabled(mContext)) {
+            return true;
+        }
+        return isChargingOrFull;
     }
 
     private boolean isCurrentUser(int userId) {
