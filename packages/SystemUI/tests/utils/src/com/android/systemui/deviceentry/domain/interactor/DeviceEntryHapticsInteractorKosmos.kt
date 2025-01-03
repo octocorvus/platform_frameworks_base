@@ -16,6 +16,7 @@
 
 package com.android.systemui.deviceentry.domain.interactor
 
+import com.android.keyguard.keyguardUpdateMonitor
 import com.android.keyguard.logging.biometricUnlockLogger
 import com.android.systemui.biometrics.data.repository.fingerprintPropertyRepository
 import com.android.systemui.dump.dumpManager
@@ -40,5 +41,6 @@ val Kosmos.deviceEntryHapticsInteractor by
             keyguardInteractor = keyguardInteractor,
             systemClock = systemClock,
             dumpManager = dumpManager,
+            keyguardUpdateMonitor = keyguardUpdateMonitor,
         )
     }
