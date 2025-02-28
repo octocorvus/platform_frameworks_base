@@ -185,6 +185,7 @@ public final class PermissionManager {
     private static final String PHONE_SERVICES_PKG = "com.android.phone";
     private static final String PRINT_SPOOLER_PKG = "com.android.printspooler";
     private static final String FUSED_LOCATION_PKG = "com.android.location.fused";
+    private static final String NETWORK_LOCATION_PKG = "app.grapheneos.networklocation";
     private static final String CELL_BROADCAST_SERVICE_PKG = "com.android.cellbroadcastservice";
 
     /**
@@ -1382,7 +1383,11 @@ public final class PermissionManager {
         pkgNames.add(PHONE_SERVICES_PKG);
         // Location usage indicator can get triggered when sharing a file to a printer
         pkgNames.add(PRINT_SPOOLER_PKG);
+
+        // location providers
         pkgNames.add(FUSED_LOCATION_PKG);
+        pkgNames.add(NETWORK_LOCATION_PKG);
+
         // indicator pops up when determining location during a geofenced alert
         pkgNames.add(CELL_BROADCAST_SERVICE_PKG);
         // location indicator sometimes gets triggered when turning on Wi-Fi hotspot
