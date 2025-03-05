@@ -158,7 +158,7 @@ public class ZygoteInit {
 
         // TODO: remove the try/catch and the flag read as soon as the flag is ramped and 25Q2
         // starts building from source.
-        if (preloadHttpengineInZygote()) {
+        if (fullPreload && preloadHttpengineInZygote()) {
             try {
                 HttpEngine.preload();
             } catch (NoSuchMethodError e){
