@@ -7139,6 +7139,10 @@ public final class Settings {
         @Protected(read = KnownSystemPackage.SYSTEM_UI, readWrite = KnownSystemPackage.SETTINGS)
         public static final String SCRAMBLE_SIM_PIN_LAYOUT = "scramble_sim_pin_layout";
 
+        /** @hide */
+        @Protected(readWrite = KnownSystemPackage.SETTINGS)
+        public static final String CROSS_PROFILE_CLIPBOARD_ACCESS = "cross_profile_clipboard_access";
+
         // ExtSettings END
 
         // NOTE: If you add new settings here, be sure to add them to
