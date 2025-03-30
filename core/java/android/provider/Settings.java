@@ -14092,6 +14092,7 @@ public final class Settings {
          * @hide
          */
         @Readable
+        @Protected(immutableValue = "0")
         public static final String ADD_USERS_WHEN_LOCKED = "add_users_when_locked";
 
         /**
