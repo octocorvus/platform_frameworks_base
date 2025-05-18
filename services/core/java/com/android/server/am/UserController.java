@@ -1366,6 +1366,12 @@ class UserController implements Handler.Callback {
             final IStopUserCallback stopUserCallback,
             KeyEvictedCallback keyEvictedCallback) {
         Slogf.i(TAG, "stopSingleUserLU userId=" + userId);
+        if (allowDelayedLocking && UserControllerHelper.disallowDelayedLockingForUser(
+                mInjector.getContext(), userId)) {
+            Slogf.i(TAG, "Disallowing delayed locking for userId=" + userId);
+            allowDelayedLocking = false;
+        }
+
         clearAnyPlansForStoppingBackgroundUser(userId);
         final UserState uss = mStartedUsers.get(userId);
         if (uss == null) {  // User is not started
@@ -1759,6 +1765,11 @@ class UserController implements Handler.Callback {
      * either due to a global device configuration or an individual user's property.
      */
     private boolean canDelayDataLockingForUser(@UserIdInt int userIdToLock) {
+        if (UserControllerHelper.disallowDelayedLockingForUser(mInjector.getContext(), userIdToLock)) {
+            Slogf.i(TAG, "Treating delayed data locking as false for userId=" + userIdToLock);
+            return false;
+        }
+
         if (allowBiometricUnlockForPrivateProfile()) {
             final UserProperties userProperties = getUserProperties(userIdToLock);
             return (mDelayUserDataLocking || (userProperties != null
