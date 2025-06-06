@@ -273,7 +273,13 @@ public class DropBoxMonitor {
                 }
             }
 
-            showCrashNotif(e, "Kernel", String.join("\n", lines), false);
+            // see https://github.com/GrapheneOS/kernel_common-6.1/blob/2025011500/mm/kasan/report.c#L210
+            boolean isKasanReport = text.contains("BUG: KASAN: ");
+
+            if (isKasanReport || ExtSettings.SHOW_SYSTEM_PROCESS_CRASH_NOTIFICATIONS.get(context)) {
+                boolean showReportButton = isKasanReport;
+                showCrashNotif(e, "Kernel", String.join("\n", lines), showReportButton);
+            }
         }
     }
 
