@@ -510,7 +510,7 @@ class DragState {
         mCrossProfileCopyAllowed = !userManager.getUserRestriction(
                 mSourceUserId, UserManager.DISALLOW_CROSS_PROFILE_COPY_PASTE);
         if (!android.ext.settings.CrossProfileClipboardAccessSettings
-                .isExportAccessAllowed(mDisplayContent.mAtmService.mContext, mSourceUserId)) {
+                .isExportAccessAllowed(mCurrentDisplayContent.mAtmService.mContext, mSourceUserId)) {
             mCrossProfileCopyAllowed = false;
         }
 
