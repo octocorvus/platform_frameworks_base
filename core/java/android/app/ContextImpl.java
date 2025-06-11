@@ -25,6 +25,7 @@ import static com.android.internal.app.ContentProviderRedirector.translateConten
 import static com.android.internal.gmscompat.GmcDebug.maybeLogSendBroadcast;
 import static com.android.internal.gmscompat.GmcDebug.maybeLogStartService;
 
+import android.Manifest;
 import android.annotation.CallbackExecutor;
 import android.annotation.IntDef;
 import android.annotation.NonNull;
