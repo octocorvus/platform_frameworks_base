@@ -160,7 +160,7 @@ public class AppZygote {
             if (!Flags.appZygoteRetryStart()) {
                 throw e;
             }
-            final boolean zygote_dead = getProcess().isDead();
+            final boolean zygote_dead = getProcess(flatExtraArgs).isDead();
             if (!zygote_dead) {
                 throw e; // Zygote process is alive. Do nothing.
             }
@@ -168,14 +168,14 @@ public class AppZygote {
         // Retry here if the previous start fails.
         Log.w(LOG_TAG, "retry starting process " + niceName);
         stopZygote();
-        return getProcess().start(processClass,
+        return getProcess(flatExtraArgs).start(processClass,
                 niceName, uid, uid, gids, runtimeFlags, mountExternal,
                 targetSdkVersion, seInfo, abi, instructionSet,
                 appDataDir, null, packageName,
                 /*zygotePolicyFlags=*/ ZYGOTE_POLICY_FLAG_EMPTY, isTopApp,
                 disabledCompatChanges, pkgDataInfoMap, allowlistedDataInfoList,
                 false, false, false,
-                zygoteArgs);
+                zygoteArgs, null);
     }
 
     @GuardedBy("mLock")
