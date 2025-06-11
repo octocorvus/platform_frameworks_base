@@ -101,6 +101,7 @@ constructor(
                     is AuthenticationMethodModel.Sim -> Cuj.CUJ_LOCKSCREEN_PIN_APPEAR
                     is AuthenticationMethodModel.Pattern -> Cuj.CUJ_LOCKSCREEN_PATTERN_APPEAR
                     is AuthenticationMethodModel.Password -> Cuj.CUJ_LOCKSCREEN_PASSWORD_APPEAR
+                    is AuthenticationMethodModel.BiometricSecondFactorPin,
                     is AuthenticationMethodModel.None -> null
                     null -> null
                 }
@@ -110,6 +111,7 @@ constructor(
                     is AuthenticationMethodModel.Sim -> Cuj.CUJ_LOCKSCREEN_PIN_DISAPPEAR
                     is AuthenticationMethodModel.Pattern -> Cuj.CUJ_LOCKSCREEN_PATTERN_DISAPPEAR
                     is AuthenticationMethodModel.Password -> Cuj.CUJ_LOCKSCREEN_PASSWORD_DISAPPEAR
+                    is AuthenticationMethodModel.BiometricSecondFactorPin,
                     is AuthenticationMethodModel.None -> null
                     null -> null
                 }
