@@ -2769,7 +2769,7 @@ public abstract class ContentResolver implements ContentInterface {
     @UnsupportedAppUsage
     public final void registerContentObserver(Uri uri, boolean notifyForDescendants,
             ContentObserver observer, @CanBeALL @CanBeCURRENT @UserIdInt int userHandle) {
-        if (ContentProviderRedirector.shouldSkipRegisterContentObserver(uri, notifyForDescendents,
+        if (ContentProviderRedirector.shouldSkipRegisterContentObserver(uri, notifyForDescendants,
                 observer, userHandle)) {
             return;
         }
