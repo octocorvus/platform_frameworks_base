@@ -472,6 +472,10 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
      * whether the app declares style to opt out.
      */
     public static boolean isOptOutEdgeToEdgeEnabled(ApplicationInfo info, boolean local) {
+        if (info.isSystemApp()) {
+            return true;
+        }
+
         final boolean disabled = local
                 // Calling this doesn't require a permission.
                 ? CompatChanges.isChangeEnabled(DISABLE_OPT_OUT_EDGE_TO_EDGE)
