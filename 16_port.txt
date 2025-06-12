@@ -1,0 +1,20 @@
+dropped 78eb2aba9001... bugfix: Check first if PackageInstaller is the calling app to uninstall an app
+fixed upstream: ff21533e7386987fe668e9d4cee20dc2d6b99add
+
+dropped 90af7fbd284b... PackageInstaller: fix NPE due to a race condition in PackageUtil
+fixed upstream: 85490371c0bb2b8772cbb21e7b6bea6086d3c5bc
+
+dropped 97a1bee3003b... bugfix: properly acquire package state from original package
+fixed upstream: 03e17d9af14ee56c7cf119838ccda4c28b6b2e7e
+
+dropped 132fe35a9692... fix check for the current holder of the Wallet app role
+fixed upstream: c28514dea5b7639633a3e5ebd8575912a4bba081
+
+dropped 7f89e651ab09... add workaround for updateWifiBatteryStats() system_server crash
+fixed upstream: b4cfeb60ddaff26cd214d0f8331737b510674f57
+
+dropped f1f3d6f5a3f6... disable wake lock based on 2+ screen undims
+disabled upstream: 9de30d99b687dc03754b7f397cb63a978ccf3631
+
+dropped c6d8830270b03591ff3bc1492033f010d8264334 disable config_keyguardUserSwitcher on tablet devices
+fixed upstream: 86b8c1db342d3f7af235639976a9d448f69bff27
