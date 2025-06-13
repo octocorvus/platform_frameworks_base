@@ -2488,6 +2488,22 @@ public class SettingsProvider extends ContentProvider {
             return;
         }
 
+        if (Build.IS_DEBUGGABLE) {
+            if (isRead && "com.android.systemui.tests".equals(callingPackage)) {
+                ApplicationInfo ai = getCallingApplicationInfoOrThrow();
+                if (ai.isSignedWithPlatformKey() && (ai.flags & ApplicationInfo.FLAG_TEST_ONLY) != 0) {
+                    // SystemUI tests run SystemUI code, so it should be able to read
+                    // SystemUI-readable settings
+                    for (int id : protSetting.readableBy()) {
+                        if (ksp.systemUi.equals(ksp.getById(id))) {
+                            Slog.d(LOG_TAG, "allowed com.android.systemui.tests to access protected setting " + protSetting.key());
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
         throw new SecurityException(callingPackage + " is not allowed to access protected setting " + protSetting.key());
     }
 
