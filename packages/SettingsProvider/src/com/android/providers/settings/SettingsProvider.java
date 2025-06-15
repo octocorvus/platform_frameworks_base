@@ -78,6 +78,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.ext.KnownSystemPackage;
 import android.ext.KnownSystemPackages;
 import android.hardware.camera2.utils.ArrayUtils;
 import android.media.AudioManager;
@@ -2489,14 +2490,15 @@ public class SettingsProvider extends ContentProvider {
         }
 
         if (Build.IS_DEBUGGABLE) {
-            if (isRead && "com.android.systemui.tests".equals(callingPackage)) {
+            String systemUiTests = "com.android.systemui.tests";
+            if (isRead && systemUiTests.equals(callingPackage)) {
                 ApplicationInfo ai = getCallingApplicationInfoOrThrow();
                 if (ai.isSignedWithPlatformKey() && (ai.flags & ApplicationInfo.FLAG_TEST_ONLY) != 0) {
                     // SystemUI tests run SystemUI code, so it should be able to read
                     // SystemUI-readable settings
                     for (int id : protSetting.readableBy()) {
-                        if (ksp.systemUi.equals(ksp.getById(id))) {
-                            Slog.d(LOG_TAG, "allowed com.android.systemui.tests to access protected setting " + protSetting.key());
+                        if (id == KnownSystemPackage.SYSTEM_UI) {
+                            Slog.d(LOG_TAG, "allowed " + systemUiTests + " to read protected setting " + protSetting.key());
                             return;
                         }
                     }
