@@ -9069,8 +9069,14 @@ public class ActivityManagerService extends IActivityManager.Stub
             res = mContext.getResources();
             final boolean userSwitchUiEnabled = !res.getBoolean(
                     com.android.internal.R.bool.config_customUserSwitchUi);
-            final int maxRunningUsers = res.getInteger(
-                    com.android.internal.R.integer.config_multiuserMaxRunningUsers);
+
+            long totalMemory = Process.getTotalMemory();
+            int totalMemoryGb = (int) (totalMemory / 1_000_000_000L);
+            final int maxRunningUsers = Math.max(totalMemoryGb - 2,
+                    res.getInteger(com.android.internal.R.integer.config_multiuserMaxRunningUsers));
+            Slog.d(TAG, "set maxRunningUsers to " + maxRunningUsers
+                    + "; Process.getTotalMemory() is " + totalMemory);
+
             final boolean delayUserDataLocking = res.getBoolean(
                     com.android.internal.R.bool.config_multiuserDelayUserDataLocking);
             final int backgroundUserConsideredDispensableTimeSecs = res.getInteger(
