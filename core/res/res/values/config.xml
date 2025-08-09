@@ -2052,7 +2052,7 @@
     <!-- The difference in millis that has to exist between a time suggestion under
          consideration by the time_detector and the system clock before the system clock will be
          changed. -->
-    <integer name="config_timeDetectorAutoUpdateDiffMillis">2000</integer>
+    <integer name="config_timeDetectorAutoUpdateDiffMillis">50</integer>
 
     <!-- Enables the GnssTimeUpdate service. This is the global switch for enabling Gnss time based
          suggestions to TimeDetector service. See also config_autoTimeSourcesPriority. -->
