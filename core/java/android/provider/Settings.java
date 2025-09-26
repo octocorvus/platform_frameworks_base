@@ -13571,6 +13571,11 @@ public final class Settings {
         @Protected(restrictReads = false, readWrite = KnownSystemPackage.SETTINGS)
         public static final String GEOCODER = "geocoder";
 
+        /** @hide */
+        @Protected(restrictReads = false, readWrite = KnownSystemPackage.SETTINGS)
+        public static final String ALLOW_GOOGLE_APPS_SPECIAL_ACCESS_TO_DEVICE_IDENTIFIERS =
+                "allow_google_apps_special_access_to_device_identifiers";
+
         // ExtSettings END
 
         // NOTE: If you add new settings here, be sure to add them to
