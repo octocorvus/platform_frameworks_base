@@ -43,4 +43,7 @@ interface ICarrierConfigLoader {
 
     PersistableBundle getConfigSubsetForSubIdWithFeature(int subId, String callingPackage,
                 String callingFeatureId, in String[] carrierConfigs);
+
+    PersistableBundle getOverrideConfigForSubIdWithFeature(int subId, String callingPackage,
+                    String callingFeatureId);
 }
