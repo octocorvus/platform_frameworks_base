@@ -18,6 +18,7 @@ package com.android.internal.telephony;
 
 import android.telephony.SubscriptionInfo;
 import android.os.ParcelUuid;
+import android.os.PersistableBundle;
 import android.os.UserHandle;
 import com.android.internal.telephony.ISetOpportunisticDataCallback;
 
@@ -411,4 +412,8 @@ interface ISub {
      */
     @EnforcePermission("WRITE_EMBEDDED_SUBSCRIPTIONS")
     void setTransferStatus(int subId, int status);
+
+    @EnforcePermission("MODIFY_PHONE_STATE")
+    boolean setExtOverrideConfigs(int subId, in PersistableBundle overrides);
+    PersistableBundle getExtOverrideConfigs(int subId);
 }

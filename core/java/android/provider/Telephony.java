@@ -5196,8 +5196,15 @@ public final class Telephony {
         public static final String COLUMN_SATELLITE_ENTITLEMENT_VOICE_SERVICE_POLICY =
                 "satellite_entitlement_voice_service_policy";
 
+        /**
+         * TelephonyProvider column name for extended SIM state
+         * @hide
+         */
+        public static final String COLUMN_EXT_SIM_STATE = "ext_sim_state";
+
         /** All columns in {@link SimInfo} table. */
         private static final List<String> ALL_COLUMNS = List.of(
+                COLUMN_EXT_SIM_STATE,
                 COLUMN_UNIQUE_KEY_SUBSCRIPTION_ID,
                 COLUMN_ICC_ID,
                 COLUMN_SIM_SLOT_INDEX,

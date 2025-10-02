@@ -1244,6 +1244,16 @@ public class SubscriptionManager {
     public static final String SATELLITE_ENTITLEMENT_VOICE_SERVICE_POLICY =
             SimInfo.COLUMN_SATELLITE_ENTITLEMENT_VOICE_SERVICE_POLICY;
 
+    /**
+     * TelephonyProvider column name for extended SIM state. Interpreted as a base64-encoded proto
+     * of ExtSimState (see CarrierConfig2)
+     * By default, it's empty.
+     * <P>Type: TEXT </P>
+     *
+     * @hide
+     */
+    public static final String EXT_SIM_STATE = SimInfo.COLUMN_EXT_SIM_STATE;
+
     /** @hide */
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(prefix = {"USAGE_SETTING_"},
