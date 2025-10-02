@@ -1246,7 +1246,7 @@ public class SubscriptionManager {
 
     /**
      * TelephonyProvider column name for extended SIM state. Interpreted as a base64-encoded proto
-     * of ExtSimState (see CarrierConfig2)
+     * of ExtSimState.
      * By default, it's empty.
      * <P>Type: TEXT </P>
      *

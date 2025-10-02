@@ -412,8 +412,4 @@ interface ISub {
      */
     @EnforcePermission("WRITE_EMBEDDED_SUBSCRIPTIONS")
     void setTransferStatus(int subId, int status);
-
-    @EnforcePermission("MODIFY_PHONE_STATE")
-    boolean setExtOverrideConfigs(int subId, in PersistableBundle overrides);
-    PersistableBundle getExtOverrideConfigs(int subId);
 }

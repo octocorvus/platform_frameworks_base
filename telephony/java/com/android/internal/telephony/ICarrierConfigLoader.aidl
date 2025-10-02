@@ -31,7 +31,9 @@ interface ICarrierConfigLoader {
             String callingFeatureId);
 
     @EnforcePermission("MODIFY_PHONE_STATE")
-    void overrideConfig(int subId, in PersistableBundle overrides, boolean persistent);
+    void overrideConfig(int subId, in PersistableBundle overrides, int type);
+    @EnforcePermission("READ_PRIVILEGED_PHONE_STATE")
+    PersistableBundle getConfigOverrides(int subId, boolean aosp);
 
     void notifyConfigChangedForSubId(int subId);
 
@@ -43,7 +45,4 @@ interface ICarrierConfigLoader {
 
     PersistableBundle getConfigSubsetForSubIdWithFeature(int subId, String callingPackage,
                 String callingFeatureId, in String[] carrierConfigs);
-
-    PersistableBundle getOverrideConfigForSubIdWithFeature(int subId, String callingPackage,
-                    String callingFeatureId);
 }

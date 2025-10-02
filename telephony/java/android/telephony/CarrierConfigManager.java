@@ -12060,6 +12060,29 @@ public class CarrierConfigManager {
     @RequiresPermission(Manifest.permission.MODIFY_PHONE_STATE)
     public void overrideConfig(int subscriptionId, @Nullable PersistableBundle overrideValues,
             boolean persistent) {
+        int type = persistent ?
+                CONFIG_OVERRIDE_TYPE_AOSP_PERSISTENT :
+                CONFIG_OVERRIDE_TYPE_AOSP_TRANSIENT;
+        overrideConfig(subscriptionId, overrideValues, type);
+    }
+
+    /** @hide */ public static final int CONFIG_OVERRIDE_TYPE_AOSP_TRANSIENT = 0;
+    /** @hide */ public static final int CONFIG_OVERRIDE_TYPE_AOSP_PERSISTENT = 1;
+    /** @hide */ public static final int CONFIG_OVERRIDE_TYPE_GRAPHENEOS = 2;
+
+    /** @hide */
+    @IntDef(value = {
+            CONFIG_OVERRIDE_TYPE_AOSP_TRANSIENT,
+            CONFIG_OVERRIDE_TYPE_AOSP_PERSISTENT,
+            CONFIG_OVERRIDE_TYPE_GRAPHENEOS,
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    @interface ConfigOverrideType {}
+
+    /** @hide */
+    @RequiresPermission(Manifest.permission.MODIFY_PHONE_STATE)
+    public void overrideConfig(int subscriptionId, @Nullable PersistableBundle overrideValues,
+            @ConfigOverrideType int type) {
         try {
             ICarrierConfigLoader loader = getICarrierConfigLoader();
             if (loader == null) {
@@ -12067,9 +12090,27 @@ public class CarrierConfigManager {
                         + " ICarrierConfigLoader is null");
                 return;
             }
-            loader.overrideConfig(subscriptionId, overrideValues, persistent);
+            loader.overrideConfig(subscriptionId, overrideValues, type);
         } catch (RemoteException ex) {
             Rlog.e(TAG, "Error setting config for subId " + subscriptionId + ": " + ex);
+        }
+    }
+
+    /** @hide */
+    @RequiresPermission(Manifest.permission.MODIFY_PHONE_STATE)
+    @NonNull
+    public PersistableBundle getConfigOverrides(int subId, boolean aosp) {
+        try {
+            ICarrierConfigLoader loader = getICarrierConfigLoader();
+            if (loader == null) {
+                Rlog.w(TAG, "Error getting config for subId " + subId
+                        + " ICarrierConfigLoader is null");
+                throw new IllegalStateException("Carrier config loader is not available.");
+            }
+            return loader.getConfigOverrides(subId, aosp);
+        } catch (RemoteException ex) {
+            Rlog.e(TAG, "Error getting config for subId " + subId + ": " + ex);
+            throw ex.rethrowAsRuntimeException();
         }
     }
 
