@@ -30,6 +30,7 @@ public class PackageHooksRegistry {
             case PackageId.ANDROID_AUTO -> new AndroidAutoHooks();
             case PackageId.PIXEL_CAMERA_SERVICES -> new PixelCameraServicesHooks();
             case PackageId.PIXEL_HEALTH -> new PixelHealthHooks();
+            case PackageId.GMS_CORE -> new GmsCoreHooks();
             default -> PackageHooks.DEFAULT;
         };
     }
