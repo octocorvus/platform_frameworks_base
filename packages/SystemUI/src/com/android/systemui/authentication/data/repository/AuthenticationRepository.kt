@@ -29,6 +29,7 @@ import com.android.internal.widget.LockscreenCredential
 import com.android.keyguard.KeyguardSecurityModel
 import com.android.systemui.authentication.shared.model.AuthenticationMethodModel
 import com.android.systemui.authentication.shared.model.AuthenticationMethodModel.Biometric
+import com.android.systemui.authentication.shared.model.AuthenticationMethodModel.BiometricSecondFactorPin
 import com.android.systemui.authentication.shared.model.AuthenticationMethodModel.None
 import com.android.systemui.authentication.shared.model.AuthenticationMethodModel.Password
 import com.android.systemui.authentication.shared.model.AuthenticationMethodModel.Pattern
@@ -408,6 +409,8 @@ constructor(
     private suspend fun getAuthenticationMethod(@UserIdInt userId: Int): AuthenticationMethodModel {
         return withContext(backgroundDispatcher) {
             when (getSecurityMode.apply(userId)) {
+                KeyguardSecurityModel.SecurityMode.BiometricSecondFactorPin ->
+                    BiometricSecondFactorPin
                 KeyguardSecurityModel.SecurityMode.PIN -> Pin
                 KeyguardSecurityModel.SecurityMode.SimPin,
                 KeyguardSecurityModel.SecurityMode.SimPuk -> Sim

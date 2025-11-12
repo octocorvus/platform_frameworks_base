@@ -17,6 +17,7 @@ package com.android.keyguard;
 
 import static android.security.Flags.secureLockDevice;
 
+import static com.android.internal.widget.LockDomain.Secondary;
 import static com.android.systemui.DejankUtils.whitelistIpcs;
 
 import android.app.admin.DevicePolicyManager;
@@ -24,6 +25,7 @@ import android.content.res.Resources;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 
+import com.android.internal.widget.LockDomain;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.systemui.dagger.SysUISingleton;
 import com.android.systemui.dagger.qualifiers.Main;
@@ -50,7 +52,8 @@ public class KeyguardSecurityModel {
         SimPin, // Unlock by entering a sim pin.
         SimPuk, // Unlock by entering a sim puk
         // TODO(b/427071498): remove upon SceneContainerFlag removal
-        SecureLockDeviceBiometricAuth // Unlock by authenticating biometric for secure lock device
+        SecureLockDeviceBiometricAuth, // Unlock by authenticating biometric for secure lock device
+        BiometricSecondFactorPin // Unlock by entering a second factor PIN.
     }
 
     private final boolean mIsPukScreenAvailable;
@@ -100,6 +103,14 @@ public class KeyguardSecurityModel {
     }
 
     public SecurityMode getSecurityMode(int userId) {
+        return getSecurityMode(userId, Secondary);
+    }
+
+    /**
+     * @param lockDomain If Primary, only return primary modes. If Secondary, return the true
+     *                   mode whether it be a primary or secondary mode.
+     */
+    public SecurityMode getSecurityMode(int userId, LockDomain lockDomain) {
         if (secureLockDevice()
                 && (mRequiresBiometricForSecureLockDevice || mAuthenticatedInSecureLockDevice)) {
             return SecurityMode.SecureLockDeviceBiometricAuth;
@@ -115,6 +126,13 @@ public class KeyguardSecurityModel {
                 mKeyguardUpdateMonitor.getNextSubIdForState(
                         TelephonyManager.SIM_STATE_PIN_REQUIRED))) {
             return SecurityMode.SimPin;
+        }
+
+        if (lockDomain == Secondary &&
+                mKeyguardUpdateMonitor.getUserAuthenticatedWithFingerprint(userId) &&
+                mKeyguardUpdateMonitor.isUnlockingWithFingerprintAllowedSafe() &&
+                mLockPatternUtils.isBiometricSecondFactorEnabled(userId)) {
+            return SecurityMode.BiometricSecondFactorPin;
         }
 
         final int security = whitelistIpcs(() ->
