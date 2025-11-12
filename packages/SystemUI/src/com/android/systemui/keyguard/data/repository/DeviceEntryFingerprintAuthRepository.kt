@@ -212,7 +212,11 @@ constructor(
                                 userId: Int,
                                 biometricSourceType: BiometricSourceType,
                                 isStrongBiometric: Boolean,
+                                secondFactorStatus: SecondFactorStatus,
                             ) {
+                                if (secondFactorStatus == SecondFactorStatus.Enabled) {
+                                    return
+                                }
                                 sendUpdateIfFingerprint(
                                     biometricSourceType,
                                     SuccessFingerprintAuthenticationStatus(
