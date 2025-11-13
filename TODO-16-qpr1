@@ -1,7 +1,6 @@
 colors: Switch to GrapheneOS blue color palette for Material You
 port 2FA tests
 enable boot/bootloader/radio version checks (not clear whether it's needed)
-SystemUI: use generic charging string indication if battery is dead
 
 Known issue:
 creating more than one Private space across all users doesn't work
