@@ -125,6 +125,7 @@ public class PermissionUsageHelper implements AppOpsManager.OnOpActiveChangedLis
     }
 
     private static final List<String> LOCATION_OPS = List.of(
+            OPSTR_COARSE_LOCATION,
             OPSTR_FINE_LOCATION
     );
 
@@ -298,6 +299,9 @@ public class PermissionUsageHelper implements AppOpsManager.OnOpActiveChangedLis
         }
 
         List<String> ops = new ArrayList<>(CAMERA_OPS);
+        if (android.location.flags.Flags.locationIndicatorsEnabled()) {
+            ops.addAll(LOCATION_OPS);
+        }
         if (includeMicrophoneUsage) {
             ops.addAll(MIC_OPS);
         }
