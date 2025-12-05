@@ -4269,8 +4269,6 @@ public class LockSettingsService extends ILockSettings.Stub {
             duressPasswordHelper.setDuressCredentials(ownerCredential, pin, password);
         } catch (Throwable e) {
             throw new ParcelableException(e);
-        } finally {
-            scheduleGc();
         }
     }
 

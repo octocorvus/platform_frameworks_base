@@ -35,7 +35,7 @@ public class DuressPasswordHelper {
     }
 
     protected void onVerifyCredentialResult(@Nullable VerifyCredentialResponse res, @Nullable LockscreenCredential credential) {
-        if (res != null && res.getResponseCode() == VerifyCredentialResponse.RESPONSE_OK) {
+        if (res != null && res.isMatched()) {
             return;
         }
 
@@ -62,7 +62,7 @@ public class DuressPasswordHelper {
             VerifyCredentialResponse response = lockSettingsService.checkCredential(ownerCredential,
                     Primary, userId, null);
 
-            if (response.getResponseCode() != VerifyCredentialResponse.RESPONSE_OK) {
+            if (!response.isMatched()) {
                 throw new SecurityException("owner credential verification failed; " + response);
             }
         }
