@@ -202,7 +202,7 @@ class NativeCommandBuffer {
         const int ENABLE_COMPAT_VA_39_BIT = 1 << 30;
         if (flags & (DISABLE_HARDENED_MALLOC | ENABLE_COMPAT_VA_39_BIT)) {
           // fallback to the slow path that calls ExecInit
-          return false;
+          return std::make_pair(false, false);
         }
         continue;
       }
