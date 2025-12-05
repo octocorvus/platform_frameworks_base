@@ -3043,7 +3043,7 @@ public final class ProcessList implements ProcessStateController.ProcessLruUpdat
 
     private static ProcessRecordSnapshot snapshotProcessRecord(ProcessRecord pr) {
         return new ProcessRecordSnapshot(pr.mPid, pr.uid, pr.userId, pr.processName, pr.info,
-            pr.getPkgList().getPackageList());
+            pr.getPkgList().getPackageNames());
     }
 
     @Nullable
