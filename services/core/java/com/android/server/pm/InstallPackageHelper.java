@@ -1093,7 +1093,7 @@ final class InstallPackageHelper {
                             Slog.d(TAG_BUSY_PACKAGES, "calling removeFromBusyPackages() from actionsAfterDexopt");
                             removeFromBusyPackages(requests);
                         }
-                    }
+                    };
                     prepPerformDexoptIfNeeded(reconciledPackages, actionsAfterDexopt);
                     shouldRemoveFromBusyPackages = false;
                 }
