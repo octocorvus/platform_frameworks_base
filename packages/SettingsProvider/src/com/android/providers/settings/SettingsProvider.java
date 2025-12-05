@@ -6901,7 +6901,6 @@ public class SettingsProvider extends ContentProvider {
                     // support face unlock, i.e. BIOMETRIC_KEYGUARD_ENABLED always meant
                     // "fingerprint keyguard unlock" for all GrapheneOS devices that can hit
                     // this migration path.
-                    final SettingsState secureSettings = getSecureSettingsLocked(userId, deviceId);
                     final Setting biometricKeyguardSetting = secureSettings.getSettingLocked(Secure.BIOMETRIC_KEYGUARD_ENABLED);
                     if (!biometricKeyguardSetting.isNull()) {
                         secureSettings.insertSettingLocked(
