@@ -174,7 +174,7 @@ class DumpBriefPackageInfo : public Command {
   public:
     explicit DumpBriefPackageInfo(text::Printer* printer,
                                   android::IDiagnostics* diag)
-        : Command("brief-package-info"), printer_(printer), diag_(diag) {
+        : Command("brief-package-info"), diag_(diag) {
       SetDescription("Print BriefPackageInfo protobuf.");
       AddRequiredFlag("--sdk-version",
           "ro.build.version.sdk value. Some package IDs are version-specific.", &sdk_version_);
@@ -184,7 +184,6 @@ class DumpBriefPackageInfo : public Command {
 
   private:
     std::string sdk_version_;
-    text::Printer* printer_;
     android::IDiagnostics* diag_;
 };
 
