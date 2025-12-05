@@ -3429,7 +3429,7 @@ public class LockSettingsService extends ILockSettings.Stub {
         final long oldProtectorId = getCurrentLskfBasedProtectorId(userId, lockDomain);
         final long newProtectorId = mSpManager.createLskfBasedProtector(getGateKeeperService(),
                 credential, lockDomain, sp, userId);
-        final Map<Integer, LockscreenCredential> profilePasswords;
+        Map<Integer, LockscreenCredential> profilePasswords = null;
         if  (lockDomain == Primary) {
             if (!credential.isNone()) {
                 // not needed by synchronizeTiedChallengeForProfiles()
