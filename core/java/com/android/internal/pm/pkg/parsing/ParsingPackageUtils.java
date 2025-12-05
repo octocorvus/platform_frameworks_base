@@ -1109,18 +1109,12 @@ public class ParsingPackageUtils {
             );
         }
 
-        List<ParsedUsesPermission> usesPermsList = pkg.getUsesPermissions();
-        var usesPerms = new java.util.HashSet<String>(usesPermsList.size() + 10);
-        for (ParsedUsesPermission p : usesPermsList) {
-            usesPerms.add(p.getName());
-        }
-
         List<ParsedUsesPermissionImpl> extraUsesPerms = pkg.getPackageParsingHooks().addUsesPermissions();
 
         if (extraUsesPerms != null) {
             for (ParsedUsesPermission p : extraUsesPerms) {
                 String name = p.getName();
-                if (!usesPerms.add(name)) {
+                if (pkg.getUsesPermissionMapping().containsKey(name)) {
                     Slog.w(TAG, "PackageParsingHooks.addUsesPermissions() " +
                             "tried to add duplicate uses-permission " + name
                             + " to pkg " + pkg.getPackageName());
