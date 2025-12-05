@@ -25,6 +25,7 @@ import com.android.server.pm.pkg.PackageUserStateInternal;
 import com.android.server.pm.pkg.SharedUserApi;
 import com.android.server.utils.Slogf;
 
+import java.util.Collection;
 import java.util.List;
 
 import static android.content.pm.GosPackageState.*;
@@ -202,9 +203,8 @@ public class GosPackageStatePmHooks {
     }
 
     private static int deriveFlags(int flags, AndroidPackage pkg) {
-        List<ParsedUsesPermission> list = pkg.getUsesPermissions();
-        for (int i = 0, m = list.size(); i < m; ++i) {
-            ParsedUsesPermission perm = list.get(i);
+        Collection<ParsedUsesPermission> usesPermissions = pkg.getUsesPermissionMapping().values();
+        for (ParsedUsesPermission perm : usesPermissions) {
             String name = perm.getName();
             switch (name) {
                 case Manifest.permission.READ_EXTERNAL_STORAGE:
