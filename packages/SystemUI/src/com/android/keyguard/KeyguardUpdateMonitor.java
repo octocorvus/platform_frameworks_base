@@ -960,7 +960,7 @@ public class KeyguardUpdateMonitor implements TrustManager.TrustListener, CoreSt
                     // being introduced by future code and is now something that all callbacks should
                     // consider.
                     cb.onBiometricAuthenticated(userId, FINGERPRINT, isStrongBiometric,
-                            isStrongBiometric);
+                            secondFactorStatus);
                 }
             }
 
