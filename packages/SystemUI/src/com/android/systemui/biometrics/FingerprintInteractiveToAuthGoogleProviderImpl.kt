@@ -5,7 +5,7 @@ import android.hardware.biometrics.common.AuthenticateReason
 import android.provider.Settings
 import android.util.Log
 import com.android.systemui.dagger.SysUISingleton
-import com.android.systemui.util.settings.repository.UserAwareSecureSettingsRepository
+import com.android.systemui.shared.settings.data.repository.SecureSettingsRepository
 import com.google.hardware.biometrics.parcelables.fingerprint.PressToAuthParcelable
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -16,7 +16,7 @@ private val TAG = "FITA_Google"
 class FingerprintInteractiveToAuthGoogleProviderImpl
 @Inject constructor(
     private val context: Context,
-    private val settings: UserAwareSecureSettingsRepository,
+    private val settings: SecureSettingsRepository,
 ): FingerprintInteractiveToAuthProvider {
 
     private val defaultSettingValue = context.resources.getBoolean(com.android.internal.R.bool.config_performantAuthDefault)
