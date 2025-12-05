@@ -199,7 +199,7 @@ class GosPackageStatePermissions {
                         .crossUserPermissions(intArr(i, "crossUserPermissions"))
                         .apply(i.getStringExtra("pkgName"), pm.snapshotComputer());
 
-                PackageManagerService.invalidatePackageInfoCache();
+                PackageManagerService.invalidatePackageInfoCache(PackageMetrics.INVALIDATION_REASON_UNSPECIFIED);
                 Slog.d(TAG, "granted permission " + i.getExtras());
             }
 
