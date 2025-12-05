@@ -70,7 +70,7 @@ public class SpecialRuntimePermUtils {
     public static int getFlags(PackageManagerService pm, AndroidPackage pkg, PackageState pkgState, int userId) {
         int flags = 0;
 
-        for (ParsedUsesPermission perm : pkg.getUsesPermissions()) {
+        for (ParsedUsesPermission perm : pkg.getUsesPermissionMapping().values()) {
             String name = perm.getName();
             switch (name) {
                 case Manifest.permission.INTERNET:
