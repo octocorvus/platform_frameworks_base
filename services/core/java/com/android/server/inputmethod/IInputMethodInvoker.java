@@ -320,4 +320,13 @@ final class IInputMethodInvoker {
             logRemoteException(e);
         }
     }
+
+    @AnyThread
+    void onPasteButtonClickFromSystem() {
+        try {
+            mTarget.onPasteButtonClickFromSystem();
+        } catch (RemoteException e) {
+            logRemoteException(e);
+        }
+    }
 }

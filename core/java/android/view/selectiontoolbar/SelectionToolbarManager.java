@@ -23,6 +23,8 @@ import android.annotation.SystemService;
 import android.content.Context;
 import android.os.RemoteException;
 
+import com.android.internal.infra.AndroidFuture;
+
 import java.util.Objects;
 
 /**
@@ -80,6 +82,16 @@ public final class SelectionToolbarManager {
         return systemSelectionToolbarEnabled();
     }
 
+    private boolean forceRemoteSelectionToolbar(Context context) {
+        AndroidFuture<Boolean> future = new AndroidFuture<>();
+        try {
+            mService.forceRemoteSelectionToolbar(context.getPackageName(), future);
+        } catch (RemoteException e) {
+            e.rethrowFromSystemServer();
+        }
+        return future.exceptionally(e -> false).join();
+    }
+
     /**
      * Returns {@code true} if remote render selection toolbar enabled, otherwise
      * returns {@code false}.
@@ -87,7 +99,8 @@ public final class SelectionToolbarManager {
     public static boolean isRemoteSelectionToolbarEnabled(Context context) {
         SelectionToolbarManager manager = context.getSystemService(SelectionToolbarManager.class);
         if (manager != null) {
-            return manager.isRemoteSelectionToolbarEnabled();
+            return manager.isRemoteSelectionToolbarEnabled()
+                    || manager.forceRemoteSelectionToolbar(context);
         }
         return false;
     }

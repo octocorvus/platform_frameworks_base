@@ -28,4 +28,6 @@ public interface ClipboardManagerInternal {
      * @param uid The uid expected to access clip data.
      */
     void notifyUserAuthorizedClipAccess(int uid);
+
+    boolean canPackageReadClipboard(String packageName, int uid);
 }

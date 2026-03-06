@@ -19,6 +19,8 @@ package android.view.selectiontoolbar;
 import android.view.selectiontoolbar.ISelectionToolbarCallback;
 import android.view.selectiontoolbar.ShowInfo;
 
+import com.android.internal.infra.AndroidFuture;
+
 /**
  * Mediator between apps and selection toolbar service implementation.
  *
@@ -28,4 +30,5 @@ oneway interface ISelectionToolbarManager {
     void showToolbar(in ShowInfo showInfo, in ISelectionToolbarCallback callback);
     void hideToolbar();
     void dismissToolbar();
+    void forceRemoteSelectionToolbar(in String packageName, in AndroidFuture future /* T=Boolean */);
 }

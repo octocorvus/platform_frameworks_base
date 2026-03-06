@@ -5860,6 +5860,18 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
                 return userData.mComputerControlInputConnectionMap.get(displayId);
             }
         }
+
+        @Override
+        public void onPasteButtonClickFromSystem(@UserIdInt int userId) {
+            synchronized (ImfLock.class) {
+                if (userId == mCurrentImeUserId) {
+                    final IInputMethodInvoker method = getCurMethodLocked();
+                    if (method != null) {
+                        method.onPasteButtonClickFromSystem();
+                    }
+                }
+            }
+        }
     }
 
     @BinderThread
