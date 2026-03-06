@@ -32,11 +32,13 @@ import android.view.selectiontoolbar.ISelectionToolbarManager;
 import android.view.selectiontoolbar.ShowInfo;
 
 import com.android.internal.R;
+import com.android.internal.infra.AndroidFuture;
 import com.android.internal.infra.ServiceConnector;
 import com.android.server.LocalServices;
 import com.android.server.SystemService;
 import com.android.server.clipboard.ClipboardManagerInternal;
 import com.android.server.input.InputManagerInternal;
+import com.android.server.inputmethod.InputMethodManagerInternal;
 
 
 public class SelectionToolbarManagerService extends SystemService {
@@ -47,6 +49,7 @@ public class SelectionToolbarManagerService extends SystemService {
 
     private InputManagerInternal mInputManagerInternal;
     private ClipboardManagerInternal mClipboardManagerInternal;
+    private InputMethodManagerInternal mInputMethodManagerInternal;
 
 
     public SelectionToolbarManagerService(Context context) {
@@ -63,6 +66,7 @@ public class SelectionToolbarManagerService extends SystemService {
     public void onStart() {
         mInputManagerInternal = LocalServices.getService(InputManagerInternal.class);
         mClipboardManagerInternal = LocalServices.getService(ClipboardManagerInternal.class);
+        mInputMethodManagerInternal = LocalServices.getService(InputMethodManagerInternal.class);
 
         publishBinderService(Context.SELECTION_TOOLBAR_SERVICE, new Stub());
     }
@@ -95,6 +99,12 @@ public class SelectionToolbarManagerService extends SystemService {
             mRemoteRenderServiceConnector.dismissToolbar(Binder.getCallingUid());
         }
 
+        @Override
+        public void forceRemoteSelectionToolbar(String packageName,
+                AndroidFuture future /* T=Boolean */) {
+            future.complete(!mClipboardManagerInternal.canPackageReadClipboard(packageName,
+                    Binder.getCallingUid()));
+        }
     }
 
     private final class SelectionToolbarRenderServiceRemoteCallback extends
@@ -108,6 +118,7 @@ public class SelectionToolbarManagerService extends SystemService {
         @Override
         public void onPasteAction(int uid) {
             mClipboardManagerInternal.notifyUserAuthorizedClipAccess(uid);
+            mInputMethodManagerInternal.onPasteButtonClickFromSystem(UserHandle.getUserId(uid));
         }
     }
 

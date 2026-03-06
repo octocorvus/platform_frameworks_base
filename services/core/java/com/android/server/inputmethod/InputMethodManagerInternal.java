@@ -348,6 +348,8 @@ public abstract class InputMethodManagerInternal {
     public abstract IRemoteComputerControlInputConnection getComputerControlInputConnection(
             @UserIdInt int userId, int displayId);
 
+    public abstract void onPasteButtonClickFromSystem(@UserIdInt int userId);
+
     /**
      * Fake implementation of {@link InputMethodManagerInternal}. All the methods do nothing.
      */
@@ -478,6 +480,10 @@ public abstract class InputMethodManagerInternal {
                 public IRemoteComputerControlInputConnection getComputerControlInputConnection(
                         @UserIdInt int userId,  int displayId) {
                     return null;
+                }
+
+                @Override
+                public void onPasteButtonClickFromSystem(@UserIdInt int userId) {
                 }
             };
 

@@ -199,6 +199,8 @@ public class ClipboardService extends SystemService {
 
     private final Object mLock = new Object();
 
+    private final ClipboardHooks mHooks;
+
     /**
      * Instantiates the clipboard.
      */
@@ -245,6 +247,8 @@ public class ClipboardService extends SystemService {
         HandlerThread workerThread = new HandlerThread(TAG);
         workerThread.start();
         mWorkerHandler = workerThread.getThreadHandler();
+
+        mHooks = new ClipboardHooks(getContext());
     }
 
     @Override
@@ -305,7 +309,7 @@ public class ClipboardService extends SystemService {
         }
     }
 
-    private static class Clipboard {
+    static class Clipboard {
         public final int userId;
         public final int deviceId;
 
@@ -694,6 +698,10 @@ public class ClipboardService extends SystemService {
                 if (clipboard == null) {
                     return null;
                 }
+                if (!mHooks.canPackageReadClipboardLocked(pkg, intendingUid, intendingUserId,
+                        clipboard)) {
+                    return null;
+                }
                 showAccessNotificationLocked(
                         pkg, intendingUid, intendingUserId, clipboard, deviceId);
                 notifyTextClassifierLocked(clipboard, pkg, intendingUid);
@@ -915,6 +923,11 @@ public class ClipboardService extends SystemService {
                     }
                 }
             }
+        }
+
+        @Override
+        public boolean canPackageReadClipboard(String packageName, int uid) {
+            return mHooks.canPackageReadClipboard(packageName, uid, UserHandle.getUserId(uid));
         }
     }
 

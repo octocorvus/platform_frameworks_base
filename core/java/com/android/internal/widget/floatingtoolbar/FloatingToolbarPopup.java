@@ -110,6 +110,15 @@ public interface FloatingToolbarPopup {
      */
     static FloatingToolbarPopup createInstance(Context context, View parent) {
         boolean enabled = SelectionToolbarManager.isRemoteSelectionToolbarEnabled(context);
+        if (enabled) {
+            android.util.Log.d(FloatingToolbar.FLOATING_TOOLBAR_TAG,
+                    "using system toolbar for package=" + context.getPackageName()
+                            + ", userId=" + context.getUserId());
+        } else {
+            android.util.Log.d(FloatingToolbar.FLOATING_TOOLBAR_TAG,
+                    "using standard toolbar for package=" + context.getPackageName()
+                            + ", userId=" + context.getUserId());
+        }
         return enabled
                 ? new RemoteFloatingToolbarPopup(context, parent)
                 : new LocalFloatingToolbarPopup(context, parent);

@@ -88,6 +88,7 @@ class IInputMethodWrapper extends IInputMethod.Stub
     private static final int DO_SET_STYLUS_WINDOW_IDLE_TIMEOUT = 160;
     private static final int DO_COMMIT_HANDWRITING_DELEGATION_TEXT_IF_AVAILABLE = 170;
     private static final int DO_DISCARD_HANDWRITING_DELEGATION_TEXT = 180;
+    private static final int DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM = 190;
 
     final WeakReference<InputMethodServiceInternal> mTarget;
     final Context mContext;
@@ -324,6 +325,12 @@ class IInputMethodWrapper extends IInputMethod.Stub
                 }
                 return;
             }
+            case DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM: {
+                if (isValid(inputMethod, target, "DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM")) {
+                    inputMethod.onPasteButtonClickFromSystem();
+                }
+                return;
+            }
         }
         Log.w(TAG, "Unhandled message code: " + msg.what);
     }
@@ -531,6 +538,12 @@ class IInputMethodWrapper extends IInputMethod.Stub
     public void setStylusWindowIdleTimeoutForTest(@DurationMillisLong long timeout) {
         mCaller.executeOrSendMessage(
                 mCaller.obtainMessageO(DO_SET_STYLUS_WINDOW_IDLE_TIMEOUT, timeout));
+    }
+
+    @BinderThread
+    @Override
+    public void onPasteButtonClickFromSystem() {
+        mCaller.executeOrSendMessage(mCaller.obtainMessage(DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM));
     }
 
     private static boolean isValid(InputMethod inputMethod, InputMethodServiceInternal target,

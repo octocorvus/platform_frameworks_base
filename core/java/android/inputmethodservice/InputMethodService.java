@@ -75,6 +75,8 @@ import android.app.compat.CompatChanges;
 import android.compat.annotation.ChangeId;
 import android.compat.annotation.EnabledSince;
 import android.compat.annotation.UnsupportedAppUsage;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -1191,6 +1193,16 @@ public class InputMethodService extends AbstractInputMethodService {
         @Override
         public void changeInputMethodSubtype(InputMethodSubtype subtype) {
             dispatchOnCurrentInputMethodSubtypeChanged(subtype);
+        }
+
+        /**
+         * {@inheritDoc}
+         * @hide
+         */
+        @MainThread
+        @Override
+        public void onPasteButtonClickFromSystem() {
+            InputMethodService.this.onPasteButtonClickFromSystem();
         }
     }
 
@@ -4624,6 +4636,41 @@ public class InputMethodService extends AbstractInputMethodService {
                     != InputMethodService.class;
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("Method must exist.", e);
+        }
+    }
+
+    private void onPasteButtonClickFromSystem() {
+        final ClipboardManager cm = getSystemService(ClipboardManager.class);
+        if (cm == null) {
+            return;
+        }
+
+        final InputConnection ic = getCurrentInputConnection();
+        final EditorInfo ei = getCurrentInputEditorInfo();
+        if (ic == null || ei == null) {
+            return;
+        }
+
+        final ClipData clip = cm.getPrimaryClip();
+        if (clip == null || clip.getItemCount() == 0) {
+            return;
+        }
+
+        ic.beginBatchEdit();
+        try {
+            for (int i = 0; i < clip.getItemCount(); i++) {
+                final ClipData.Item item = clip.getItemAt(i);
+
+                final CharSequence text = item.getText();
+                if (text != null) {
+                    ic.commitText(text, /* newCursorPosition = */ 1);
+                    continue;
+                }
+
+                // TODO: handle other kinds of clipboard data
+            }
+        } finally {
+            ic.endBatchEdit();
         }
     }
 }

@@ -263,8 +263,9 @@ public final class RemoteSelectionToolbar {
                     if (toolbarMenuItem.itemId == R.id.paste
                             || toolbarMenuItem.itemId == R.id.pasteAsPlainText) {
                         mOnPasteActionCallback.onPasteAction(mUid);
+                    } else {
+                        mCallbackWrapper.onMenuItemClicked(toolbarMenuItem.itemIndex);
                     }
-                    mCallbackWrapper.onMenuItemClicked(toolbarMenuItem.itemIndex);
                 }
             });
         };
