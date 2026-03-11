@@ -348,7 +348,8 @@ public abstract class InputMethodManagerInternal {
     public abstract IRemoteComputerControlInputConnection getComputerControlInputConnection(
             @UserIdInt int userId, int displayId);
 
-    public abstract void onPasteButtonClickFromSystem(@UserIdInt int userId);
+    public abstract void onPasteButtonClickFromSystem(@UserIdInt int userId,
+            boolean isPlainTextPaste);
 
     /**
      * Fake implementation of {@link InputMethodManagerInternal}. All the methods do nothing.
@@ -483,7 +484,8 @@ public abstract class InputMethodManagerInternal {
                 }
 
                 @Override
-                public void onPasteButtonClickFromSystem(@UserIdInt int userId) {
+                public void onPasteButtonClickFromSystem(@UserIdInt int userId,
+                        boolean isPlainTextPaste) {
                 }
             };
 

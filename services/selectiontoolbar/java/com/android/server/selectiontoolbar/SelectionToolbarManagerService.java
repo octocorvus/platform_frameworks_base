@@ -116,9 +116,10 @@ public class SelectionToolbarManagerService extends SystemService {
         }
 
         @Override
-        public void onPasteAction(int uid) {
+        public void onPasteAction(int uid, boolean isPlainTextPaste) {
             mClipboardManagerInternal.notifyUserAuthorizedClipAccess(uid);
-            mInputMethodManagerInternal.onPasteButtonClickFromSystem(UserHandle.getUserId(uid));
+            mInputMethodManagerInternal.onPasteButtonClickFromSystem(UserHandle.getUserId(uid),
+                    isPlainTextPaste);
         }
     }
 

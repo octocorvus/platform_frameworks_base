@@ -449,7 +449,7 @@ public interface InputMethod {
     /**
      * @hide
      */
-    default void onPasteButtonClickFromSystem() {
+    default void onPasteButtonClickFromSystem(boolean isPlainTextPaste) {
         // intentionally empty
     }
 }

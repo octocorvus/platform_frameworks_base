@@ -57,6 +57,7 @@ import static android.view.inputmethod.ConnectionlessHandwritingCallback.CONNECT
 import static android.view.inputmethod.Flags.FLAG_CONNECTIONLESS_HANDWRITING;
 import static android.view.inputmethod.Flags.FLAG_VERIFY_KEY_EVENT;
 import static android.view.inputmethod.Flags.ctrlShiftShortcut;
+import static android.view.inputmethod.InputConnection.INPUT_CONTENT_GRANT_READ_URI_PERMISSION;
 
 import android.annotation.CallSuper;
 import android.annotation.DrawableRes;
@@ -1201,8 +1202,8 @@ public class InputMethodService extends AbstractInputMethodService {
          */
         @MainThread
         @Override
-        public void onPasteButtonClickFromSystem() {
-            InputMethodService.this.onPasteButtonClickFromSystem();
+        public void onPasteButtonClickFromSystem(boolean isPlainTextPaste) {
+            InputMethodService.this.onPasteButtonClickFromSystem(isPlainTextPaste);
         }
     }
 
@@ -4639,7 +4640,7 @@ public class InputMethodService extends AbstractInputMethodService {
         }
     }
 
-    private void onPasteButtonClickFromSystem() {
+    private void onPasteButtonClickFromSystem(boolean isPlainTextPaste) {
         final ClipboardManager cm = getSystemService(ClipboardManager.class);
         if (cm == null) {
             return;
@@ -4661,13 +4662,29 @@ public class InputMethodService extends AbstractInputMethodService {
             for (int i = 0; i < clip.getItemCount(); i++) {
                 final ClipData.Item item = clip.getItemAt(i);
 
-                final CharSequence text = item.getText();
-                if (text != null) {
-                    ic.commitText(text, /* newCursorPosition = */ 1);
+                boolean handledAsRichContent = false;
+                if (!isPlainTextPaste && item.getUri() != null) {
+                    InputContentInfo inputContentInfo = new InputContentInfo(item.getUri(),
+                            clip.getDescription());
+                    handledAsRichContent = ic.commitContent(inputContentInfo,
+                            INPUT_CONTENT_GRANT_READ_URI_PERMISSION, null);
+                }
+                if (handledAsRichContent) {
                     continue;
                 }
 
-                // TODO: handle other kinds of clipboard data
+                boolean hasText = item.getText() != null || item.getHtmlText() != null;
+                if (hasText) {
+                    final CharSequence textToPaste;
+                    if (isPlainTextPaste) {
+                        textToPaste = item.coerceToText(this).toString();
+                    } else {
+                        textToPaste = item.coerceToStyledText(this);
+                    }
+                    if (!TextUtils.isEmpty(textToPaste)) {
+                        ic.commitText(textToPaste, /* newCursorPosition = */ 1);
+                    }
+                }
             }
         } finally {
             ic.endBatchEdit();

@@ -322,9 +322,9 @@ final class IInputMethodInvoker {
     }
 
     @AnyThread
-    void onPasteButtonClickFromSystem() {
+    void onPasteButtonClickFromSystem(boolean isPlainTextPaste) {
         try {
-            mTarget.onPasteButtonClickFromSystem();
+            mTarget.onPasteButtonClickFromSystem(isPlainTextPaste);
         } catch (RemoteException e) {
             logRemoteException(e);
         }

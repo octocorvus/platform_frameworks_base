@@ -327,7 +327,7 @@ class IInputMethodWrapper extends IInputMethod.Stub
             }
             case DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM: {
                 if (isValid(inputMethod, target, "DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM")) {
-                    inputMethod.onPasteButtonClickFromSystem();
+                    inputMethod.onPasteButtonClickFromSystem(msg.arg1 != 0);
                 }
                 return;
             }
@@ -542,8 +542,9 @@ class IInputMethodWrapper extends IInputMethod.Stub
 
     @BinderThread
     @Override
-    public void onPasteButtonClickFromSystem() {
-        mCaller.executeOrSendMessage(mCaller.obtainMessage(DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM));
+    public void onPasteButtonClickFromSystem(boolean isPlainTextPaste) {
+        mCaller.executeOrSendMessage(mCaller.obtainMessageI(DO_ON_PASTE_BUTTON_CLICK_FROM_SYSTEM,
+                isPlainTextPaste ? 1 : 0));
     }
 
     private static boolean isValid(InputMethod inputMethod, InputMethodServiceInternal target,

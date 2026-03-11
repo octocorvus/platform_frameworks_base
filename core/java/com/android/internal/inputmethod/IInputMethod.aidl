@@ -97,5 +97,5 @@ oneway interface IInputMethod {
 
     void setStylusWindowIdleTimeoutForTest(long timeout);
 
-    void onPasteButtonClickFromSystem();
+    void onPasteButtonClickFromSystem(boolean isPlainTextPaste);
 }

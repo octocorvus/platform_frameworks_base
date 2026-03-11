@@ -262,7 +262,8 @@ public final class RemoteSelectionToolbar {
                 if (tag instanceof ToolbarMenuItem toolbarMenuItem) {
                     if (toolbarMenuItem.itemId == R.id.paste
                             || toolbarMenuItem.itemId == R.id.pasteAsPlainText) {
-                        mOnPasteActionCallback.onPasteAction(mUid);
+                        mOnPasteActionCallback.onPasteAction(mUid,
+                                toolbarMenuItem.itemId == R.id.pasteAsPlainText);
                     } else {
                         mCallbackWrapper.onMenuItemClicked(toolbarMenuItem.itemIndex);
                     }
@@ -1293,10 +1294,26 @@ public final class RemoteSelectionToolbar {
     private static List<ToolbarMenuItem> transformMenuItems(Context context,
             List<ToolbarMenuItem> menuItems) {
         ArrayList<ToolbarMenuItem> transformedMenuItems = new ArrayList<>(menuItems.size());
+
+        final String pasteString = context.getString(R.string.paste);
+        final String pasteAsPLainTextString = context.getString(R.string.paste_as_plain_text);
+
         for (int i = 0; i < menuItems.size(); i++) {
             ToolbarMenuItem menuItem = menuItems.get(i);
 
-            transformedMenuItems.add(switch (menuItem.itemId) {
+            // Normalize IDs for known paste actions. Many libraries (e.g., some versions of Jetpack
+            // Compose) use custom IDs for menu items. We override these with framework constants if
+            // the title matches "Paste" or "Paste as plain text" to ensure that paste through
+            // system toolbar works consistently.
+            int resolvedItemId = menuItem.itemId;
+            String currentTitle = String.valueOf(menuItem.title);
+            if (currentTitle.equals(pasteString)) {
+                resolvedItemId = android.R.id.paste;
+            } else if (currentTitle.equals(pasteAsPLainTextString)) {
+                resolvedItemId = android.R.id.pasteAsPlainText;
+            }
+
+            transformedMenuItems.add(switch (resolvedItemId) {
                 case android.R.id.paste -> {
                     ToolbarMenuItem newMenuItem = new ToolbarMenuItem();
 
@@ -1305,8 +1322,8 @@ public final class RemoteSelectionToolbar {
                     newMenuItem.itemIndex = menuItem.itemIndex;
 
                     newMenuItem.itemId = android.R.id.paste;
-                    newMenuItem.title = context.getString(R.string.paste);
-                    newMenuItem.contentDescription = context.getString(R.string.paste);
+                    newMenuItem.title = pasteString;
+                    newMenuItem.contentDescription = pasteString;
 
                     yield newMenuItem;
                 }
@@ -1318,9 +1335,8 @@ public final class RemoteSelectionToolbar {
                     newMenuItem.itemIndex = menuItem.itemIndex;
 
                     newMenuItem.itemId = android.R.id.pasteAsPlainText;
-                    newMenuItem.title = context.getString(R.string.paste_as_plain_text);
-                    newMenuItem.contentDescription = context.getString(
-                            R.string.paste_as_plain_text);
+                    newMenuItem.title = pasteAsPLainTextString;
+                    newMenuItem.contentDescription = pasteAsPLainTextString;
 
                     yield newMenuItem;
                 }

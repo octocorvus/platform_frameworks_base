@@ -5862,12 +5862,12 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
         }
 
         @Override
-        public void onPasteButtonClickFromSystem(@UserIdInt int userId) {
+        public void onPasteButtonClickFromSystem(@UserIdInt int userId, boolean isPlainTextPaste) {
             synchronized (ImfLock.class) {
                 if (userId == mCurrentImeUserId) {
                     final IInputMethodInvoker method = getCurMethodLocked();
                     if (method != null) {
-                        method.onPasteButtonClickFromSystem();
+                        method.onPasteButtonClickFromSystem(isPlainTextPaste);
                     }
                 }
             }
