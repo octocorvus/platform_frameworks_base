@@ -186,6 +186,7 @@ import com.android.server.EventLogTags;
 import com.android.server.LocalServices;
 import com.android.server.ServiceThread;
 import com.android.server.SystemService;
+import com.android.server.clipboard.ClipboardManagerInternal;
 import com.android.server.companion.virtual.VirtualDeviceManagerInternal;
 import com.android.server.input.InputManagerInternal;
 import com.android.server.inputmethod.InputMethodManagerInternal.InputMethodListListener;
@@ -1772,6 +1773,11 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
     void unbindCurrentClientLocked(@UnbindReason int unbindClientReason, @UserIdInt int userId) {
         final var userData = getUserData(userId);
         if (userData.mCurClient != null) {
+            final var cmi = LocalServices.getService(ClipboardManagerInternal.class);
+            if (cmi != null) {
+                cmi.removePendingPasteAction(userData.mCurClient.mUid);
+            }
+
             ProtoLog.v(IMMS_DEBUG, "unbindCurrentInputLocked: client=%s",
                     userData.mCurClient.mClient.asBinder());
             final var bindingController = userData.mBindingController;
@@ -1907,7 +1913,8 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
                     userData);
             AccessibilityManagerInternal.get().startInput(
                     userData.mCurRemoteAccessibilityInputConnection,
-                    userData.mCurEditorInfo, !initial /* restarting */);
+                    userData.mCurEditorInfo, !initial /* restarting */,
+                    userData.mCurClient.mSelfReportedDisplayId);
         }
     }
 
@@ -4642,6 +4649,29 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
         scheduleResetStylusHandwriting();
     }
 
+    @BinderThread
+    @GuardedBy("ImfLock.class")
+    private void onImePasteActionLocked(@NonNull UserData userData) {
+        final ClientState curClient = userData.mCurClient;
+        if (curClient == null) {
+            return;
+        }
+
+        final var cmi = LocalServices.getService(ClipboardManagerInternal.class);
+        if (cmi == null) {
+            return;
+        }
+
+        if (mVdmInternal == null) {
+            mVdmInternal = LocalServices.getService(VirtualDeviceManagerInternal.class);
+        }
+        final int deviceId = mVdmInternal == null
+                ? DEVICE_ID_DEFAULT
+                : mVdmInternal.getDeviceIdForDisplayId(curClient.mSelfReportedDisplayId);
+
+        cmi.addPendingPasteAction(curClient.mUid, deviceId);
+    }
+
     @GuardedBy("ImfLock.class")
     private void setInputMethodWithSubtypeIndexLocked(String id, int subtypeIndex,
             @UserIdInt int userId) {
@@ -7046,6 +7076,24 @@ public final class InputMethodManagerService implements IInputMethodManagerImpl.
                 } finally {
                     Binder.restoreCallingIdentity(ident);
                 }
+            }
+        }
+
+        @BinderThread
+        @Override
+        public void onPasteAction(AndroidFuture future /* T=Void */) {
+            @SuppressWarnings("unchecked") final AndroidFuture<Void> typedFuture = future;
+            try {
+                synchronized (ImfLock.class) {
+                    if (!calledWithValidTokenLocked(mToken, mUserData)) {
+                        typedFuture.complete(null);
+                        return;
+                    }
+                    mImms.onImePasteActionLocked(mUserData);
+                    typedFuture.complete(null);
+                }
+            } catch (Throwable e) {
+                typedFuture.completeExceptionally(e);
             }
         }
 

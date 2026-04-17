@@ -477,7 +477,7 @@ public final class SystemServiceRegistry {
                         if (b == null) {
                             return null;
                         }
-                        return new SelectionToolbarManager(
+                        return new SelectionToolbarManager(ctx.getOuterContext(),
                                 ISelectionToolbarManager.Stub.asInterface(b));
                     }});
 

@@ -34,6 +34,7 @@ import static android.view.accessibility.AccessibilityNodeInfo.ACTION_ACCESSIBIL
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLEAR_ACCESSIBILITY_FOCUS;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_CLICK;
 import static android.view.accessibility.AccessibilityNodeInfo.ACTION_LONG_CLICK;
+import static android.view.accessibility.AccessibilityNodeInfo.ACTION_PASTE;
 
 import static com.android.server.pm.UserManagerService.enforceCurrentUserIfVisibleBackgroundEnabled;
 import static com.android.window.flags.Flags.scvhSurfaceControlLifetimeFix;
@@ -351,6 +352,8 @@ abstract class AbstractAccessibilityServiceConnection extends IAccessibilityServ
         int performScreenCapture(
                 ScreenCaptureInternal.LayerCaptureArgs captureArgs,
                 ScreenCaptureInternal.ScreenCaptureListener captureListener);
+
+        void onPasteAction();
     }
 
     public AbstractAccessibilityServiceConnection(Context context, ComponentName componentName,
@@ -2327,6 +2330,9 @@ abstract class AbstractAccessibilityServiceConnection extends IAccessibilityServ
 
             if (action == ACTION_CLICK || action == ACTION_LONG_CLICK) {
                 mA11yWindowManager.notifyOutsideTouch(userId, resolvedWindowId);
+            }
+            if (action == ACTION_PASTE) {
+                mSystemSupport.onPasteAction();
             }
             if (windowToken != null) {
                 mWindowManagerService.requestWindowFocus(windowToken);

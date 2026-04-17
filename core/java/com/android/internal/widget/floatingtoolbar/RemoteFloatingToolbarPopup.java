@@ -173,7 +173,7 @@ public final class RemoteFloatingToolbarPopup implements FloatingToolbarPopup {
         final ShowInfo showInfo = new ShowInfo();
         showInfo.sequenceNumber = sequenceNumber;
         showInfo.layoutRequired = isLayoutRequired;
-        showInfo.menuItems = getToolbarMenuItems(menuItems);
+        showInfo.menuItems = getToolbarMenuItems(mContext, menuItems);
         showInfo.contentRect = contentRect;
         showInfo.suggestedWidth = suggestWidth;
         showInfo.viewPortOnScreen = mScreenViewPort;
@@ -310,12 +310,28 @@ public final class RemoteFloatingToolbarPopup implements FloatingToolbarPopup {
         return new Point(Math.max(0, x - windowLeftOnScreen), Math.max(0, y - windowTopOnScreen));
     }
 
-    private static List<ToolbarMenuItem> getToolbarMenuItems(List<MenuItem> menuItems) {
+    private static List<ToolbarMenuItem> getToolbarMenuItems(Context ctx, List<MenuItem> menuItems) {
         final List<ToolbarMenuItem> list = new ArrayList<>(menuItems.size());
+
+        final CharSequence pasteTitle = ctx.getText(android.R.string.paste);
+        final CharSequence pasteAsPlainTextTitle = ctx.getText(android.R.string.paste_as_plain_text);
+
         for (int i = 0; i < menuItems.size(); i++) {
             MenuItem menuItem = menuItems.get(i);
+
+            // Normalize IDs for known paste actions. Many libraries (e.g., some versions of Jetpack
+            // Compose) use custom IDs for menu items. We override these with framework constants if
+            // the title exactly matches localized "Paste" or "Paste as plain text" to ensure that
+            // paste through system toolbar works consistently.
+            int resolvedItemId = menuItem.getItemId();
+            if (TextUtils.equals(pasteTitle, menuItem.getTitle())) {
+                resolvedItemId = android.R.id.paste;
+            } else if (TextUtils.equals(pasteAsPlainTextTitle, menuItem.getTitle())) {
+                resolvedItemId = android.R.id.pasteAsPlainText;
+            }
+
             ToolbarMenuItem toolbarMenuItem = new ToolbarMenuItem();
-            toolbarMenuItem.itemId = menuItem.getItemId();
+            toolbarMenuItem.itemId = resolvedItemId;
             toolbarMenuItem.itemIndex = i;
             toolbarMenuItem.title = menuItem.getTitle();
             toolbarMenuItem.contentDescription = menuItem.getContentDescription();

@@ -4461,6 +4461,17 @@ public class InputMethodService extends AbstractInputMethodService {
              * {@inheritDoc}
              */
             @Override
+            public void onPasteAction() {
+                final InputBinding binding = getCurrentInputBinding();
+                if (binding != null) {
+                    mPrivOps.onPasteAction();
+                }
+            }
+
+            /**
+             * {@inheritDoc}
+             */
+            @Override
             public void dump(FileDescriptor fd, PrintWriter fout, String[]args) {
                 InputMethodService.this.dump(fd, fout, args);
             }

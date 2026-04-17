@@ -208,6 +208,8 @@ import com.android.server.accessibility.magnification.MagnificationConnectionMan
 import com.android.server.accessibility.magnification.MagnificationController;
 import com.android.server.accessibility.magnification.MagnificationProcessor;
 import com.android.server.accessibility.magnification.MagnificationScaleProvider;
+import com.android.server.clipboard.ClipboardManagerInternal;
+import com.android.server.companion.virtual.VirtualDeviceManagerInternal;
 import com.android.server.inputmethod.InputMethodManagerInternal;
 import com.android.server.pm.UserManagerInternal;
 import com.android.server.policy.WindowManagerPolicy;
@@ -422,6 +424,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
     IRemoteAccessibilityInputConnection mRemoteInputConnection;
     EditorInfo mEditorInfo;
     boolean mRestarting;
+    int mSelfReportedDisplayId;
     boolean mInputSessionRequested;
     private SparseArray<SurfaceControl> mA11yOverlayLayers = new SparseArray<>();
     private ComponentName mTrustedAccessibilityServiceForTesting = null;
@@ -491,8 +494,9 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
         @Override
         public void startInput(
                 IRemoteAccessibilityInputConnection remoteAccessibilityInputConnection,
-                EditorInfo editorInfo, boolean restarting) {
-            mService.scheduleStartInput(remoteAccessibilityInputConnection, editorInfo, restarting);
+                EditorInfo editorInfo, boolean restarting, int selfReportedDisplayId) {
+            mService.scheduleStartInput(remoteAccessibilityInputConnection, editorInfo, restarting,
+                    selfReportedDisplayId);
         }
 
         @Override
@@ -6572,6 +6576,47 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
     }
 
     @Override
+    public void onPasteAction() {
+        synchronized (mLock) {
+            final var cmi = LocalServices.getService(ClipboardManagerInternal.class);
+            if (cmi == null) {
+                return;
+            }
+
+            final int uid;
+            try {
+                uid = mPackageManager.getPackageUidAsUser(mEditorInfo.packageName, mCurrentUserId);
+            } catch (PackageManager.NameNotFoundException e) {
+                return;
+            }
+
+            final var vdmi = LocalServices.getService(VirtualDeviceManagerInternal.class);
+            final int deviceId = vdmi == null
+                    ? DEVICE_ID_DEFAULT
+                    : vdmi.getDeviceIdForDisplayId(mSelfReportedDisplayId);
+
+            cmi.addPendingPasteAction(uid, deviceId);
+        }
+    }
+
+    @GuardedBy("mLock")
+    private void removeCurPendingPasteActionLocked() {
+        final var cmi = LocalServices.getService(ClipboardManagerInternal.class);
+        if (cmi == null) {
+            return;
+        }
+
+        final int uid;
+        try {
+            uid = mPackageManager.getPackageUidAsUser(mEditorInfo.packageName, mCurrentUserId);
+        } catch (PackageManager.NameNotFoundException e) {
+            return;
+        }
+
+        cmi.removePendingPasteAction(uid);
+    }
+
+    @Override
     public void requestImeLocked(AbstractAccessibilityServiceConnection connection) {
         if (!(connection instanceof AccessibilityServiceConnection)
                 || (connection instanceof ProxyAccessibilityServiceConnection)) {
@@ -6689,6 +6734,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
 
     private void unbindInput() {
         synchronized (mLock) {
+            removeCurPendingPasteActionLocked();
             mInputBound = false;
             AccessibilityUserState userState = getCurrentUserStateLocked();
             for (int i = userState.mBoundServices.size() - 1; i >= 0; i--) {
@@ -6704,18 +6750,19 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
      * Start input for accessibility services which request ime capabilities.
      */
     public void scheduleStartInput(IRemoteAccessibilityInputConnection connection,
-            EditorInfo editorInfo, boolean restarting) {
+            EditorInfo editorInfo, boolean restarting, int selfReportedDisplayId) {
         mMainHandler.sendMessage(obtainMessage(AccessibilityManagerService::startInput, this,
-                connection, editorInfo, restarting));
+                connection, editorInfo, restarting, selfReportedDisplayId));
     }
 
     private void startInput(IRemoteAccessibilityInputConnection connection, EditorInfo editorInfo,
-            boolean restarting) {
+            boolean restarting, int selfReportedDisplayId) {
         synchronized (mLock) {
             // Keep records of these in case new Accessibility Services are enabled.
             mRemoteInputConnection = connection;
             mEditorInfo = editorInfo;
             mRestarting = restarting;
+            mSelfReportedDisplayId = selfReportedDisplayId;
             AccessibilityUserState userState = getCurrentUserStateLocked();
             for (int i = userState.mBoundServices.size() - 1; i >= 0; i--) {
                 final AccessibilityServiceConnection service = userState.mBoundServices.get(i);

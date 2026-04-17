@@ -28,4 +28,8 @@ public interface ClipboardManagerInternal {
      * @param uid The uid expected to access clip data.
      */
     void notifyUserAuthorizedClipAccess(int uid);
+
+    void addPendingPasteAction(int uid, int deviceId);
+
+    void removePendingPasteAction(int uid);
 }

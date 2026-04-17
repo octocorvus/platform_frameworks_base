@@ -48,7 +48,7 @@ public abstract class AccessibilityManagerInternal {
     /** Start input for all accessibility services which require ime capabilities. */
     public abstract void startInput(
             IRemoteAccessibilityInputConnection remoteAccessibilityInputConnection,
-            EditorInfo editorInfo, boolean restarting);
+            EditorInfo editorInfo, boolean restarting, int selfReportedDisplayId);
 
     /** Trigger a system action with the provided {@code actionId}. */
     public abstract void performSystemAction(int actionId);
@@ -82,7 +82,7 @@ public abstract class AccessibilityManagerInternal {
 
         @Override
         public void startInput(IRemoteAccessibilityInputConnection remoteAccessibility,
-                EditorInfo editorInfo, boolean restarting) {
+                EditorInfo editorInfo, boolean restarting, int selfReportedDisplayId) {
         }
 
         @Override

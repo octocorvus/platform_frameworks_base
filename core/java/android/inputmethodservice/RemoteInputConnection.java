@@ -332,6 +332,12 @@ final class RemoteInputConnection implements InputConnection {
 
     @AnyThread
     public boolean performContextMenuAction(int id) {
+        if (id == android.R.id.paste || id == android.R.id.pasteAsPlainText) {
+            final InputMethodServiceInternal imsInternal = mImsInternal.getAndWarnIfNull();
+            if (imsInternal != null) {
+                imsInternal.onPasteAction();
+            }
+        }
         return mInvoker.performContextMenuAction(id);
     }
 
