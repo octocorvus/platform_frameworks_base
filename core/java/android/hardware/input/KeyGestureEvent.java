@@ -137,6 +137,8 @@ public final class KeyGestureEvent {
     public static final int KEY_GESTURE_TYPE_TOGGLE_FULLSCREEN = 82;
     public static final int KEY_GESTURE_TYPE_TAKE_PARTIAL_SCREENSHOT = 83;
     public static final int KEY_GESTURE_TYPE_REJECT_HOME_ON_EXTERNAL_DISPLAY = 84;
+    public static final int KEY_GESTURE_TYPE_PASTE = 85;
+    public static final int KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT = 86;
 
     public static final int FLAG_CANCELLED = 1 << 0;
     public static final int FLAG_LONG_PRESS = 1 << 1;
@@ -236,6 +238,8 @@ public final class KeyGestureEvent {
             KEY_GESTURE_TYPE_TOGGLE_FULLSCREEN,
             KEY_GESTURE_TYPE_TAKE_PARTIAL_SCREENSHOT,
             KEY_GESTURE_TYPE_REJECT_HOME_ON_EXTERNAL_DISPLAY,
+            KEY_GESTURE_TYPE_PASTE,
+            KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT,
     })
     @Retention(RetentionPolicy.SOURCE)
     public @interface KeyGestureType {
@@ -848,6 +852,10 @@ public final class KeyGestureEvent {
                 return "KEY_GESTURE_TYPE_TAKE_PARTIAL_SCREENSHOT";
             case KEY_GESTURE_TYPE_REJECT_HOME_ON_EXTERNAL_DISPLAY:
                 return "KEY_GESTURE_TYPE_REJECT_HOME_ON_EXTERNAL_DISPLAY";
+            case KEY_GESTURE_TYPE_PASTE:
+                return "KEY_GESTURE_TYPE_PASTE";
+            case KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT:
+                return "KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT";
             default:
                 return Integer.toHexString(value);
         }

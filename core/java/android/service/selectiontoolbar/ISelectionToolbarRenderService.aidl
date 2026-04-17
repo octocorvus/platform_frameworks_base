@@ -26,7 +26,7 @@ import android.view.selectiontoolbar.ShowInfo;
  */
 oneway interface ISelectionToolbarRenderService {
     void onConnected(in IBinder callback);
-    void onShow(int uid, in ShowInfo showInfo, in ISelectionToolbarCallback callback);
+    void onShow(int uid, int deviceId, in ShowInfo showInfo, in ISelectionToolbarCallback callback);
     void onHide(int uid);
     void onDismiss(int uid);
     void onUidDied(int uid);

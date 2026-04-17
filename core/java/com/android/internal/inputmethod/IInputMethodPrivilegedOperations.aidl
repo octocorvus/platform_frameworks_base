@@ -49,4 +49,5 @@ oneway interface IInputMethodPrivilegedOperations {
     void switchKeyboardLayoutAsync(int direction);
     void setHandwritingSurfaceNotTouchable(boolean notTouchable);
     void setHandwritingTouchableRegion(in Region region);
+    void onPasteAction(in IBinder startInputToken, in AndroidFuture future /* T=Void */);
 }

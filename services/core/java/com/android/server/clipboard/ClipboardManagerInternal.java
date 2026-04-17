@@ -16,6 +16,8 @@
 
 package com.android.server.clipboard;
 
+import android.annotation.Nullable;
+
 /**
  * Internal interface for the clipboard manager.
  */
@@ -28,4 +30,13 @@ public interface ClipboardManagerInternal {
      * @param uid The uid expected to access clip data.
      */
     void notifyUserAuthorizedClipAccess(int uid);
+
+    interface PasteGrant {
+        void revoke();
+    }
+
+    @Nullable
+    PasteGrant createPasteGrant(int uid, int deviceId);
+
+    void revokePasteGrant(int uid);
 }

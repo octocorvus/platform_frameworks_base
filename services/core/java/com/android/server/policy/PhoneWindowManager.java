@@ -3472,7 +3472,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 KeyGestureEvent.KEY_GESTURE_TYPE_TOGGLE_DO_NOT_DISTURB,
                 KeyGestureEvent.KEY_GESTURE_TYPE_RINGER_TOGGLE_CHORD,
                 KeyGestureEvent.KEY_GESTURE_TYPE_GLOBAL_ACTIONS,
-                KeyGestureEvent.KEY_GESTURE_TYPE_TV_TRIGGER_BUG_REPORT
+                KeyGestureEvent.KEY_GESTURE_TYPE_TV_TRIGGER_BUG_REPORT,
+                KeyGestureEvent.KEY_GESTURE_TYPE_PASTE,
+                KeyGestureEvent.KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT
         ));
         if (!com.android.window.flags.Flags.grantManageKeyGesturesToRecents()) {
             // When grantManageKeyGesturesToRecents is enabled, the event is handled in the
@@ -3680,6 +3682,15 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     nm.setZenMode(isEnabled ? Settings.Global.ZEN_MODE_OFF
                                     : Settings.Global.ZEN_MODE_IMPORTANT_INTERRUPTIONS, null,
                             "Key gesture DND", true);
+                }
+                break;
+            case KeyGestureEvent.KEY_GESTURE_TYPE_PASTE:
+            case KeyGestureEvent.KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT:
+                if (complete) {
+                    final int actionId = gestureType == KeyGestureEvent.KEY_GESTURE_TYPE_PASTE
+                            ? android.R.id.paste
+                            : android.R.id.pasteAsPlainText;
+                    InputMethodManagerInternal.get().onSystemPasteShortcut(focusedToken, actionId);
                 }
                 break;
             default:

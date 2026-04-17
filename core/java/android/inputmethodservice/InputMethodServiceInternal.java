@@ -61,6 +61,9 @@ interface InputMethodServiceInternal {
     default void notifyUserActionIfNecessary() {
     }
 
+    default void onPasteAction() {
+    }
+
     /**
      * Called when the system is asking the IME to dump its information for debugging.
      *

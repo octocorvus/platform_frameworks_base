@@ -320,4 +320,13 @@ final class IInputMethodInvoker {
             logRemoteException(e);
         }
     }
+
+    @AnyThread
+    void performContextMenuAction(int id) {
+        try {
+            mTarget.performContextMenuAction(id);
+        } catch (RemoteException e) {
+            logRemoteException(e);
+        }
+    }
 }

@@ -85,6 +85,7 @@ public final class RemoteSelectionToolbar {
     private static final int TOOLBAR_STATE_DISMISSED = 3;
 
     private final int mUid;
+    private final int mDeviceId;
 
     private final Context mContext;
 
@@ -172,11 +173,12 @@ public final class RemoteSelectionToolbar {
     private final Rect mTempContentRectForRoot = new Rect();
     private final int[] mTempCoords = new int[2];
 
-    public RemoteSelectionToolbar(int uid, Context context,
+    public RemoteSelectionToolbar(int uid, int deviceId, Context context,
             ShowInfo showInfo, SelectionToolbarRenderService.RemoteCallbackWrapper callbackWrapper,
             SelectionToolbarRenderService.TransferTouchListener transferTouchListener,
             SelectionToolbarRenderService.OnPasteActionCallback onPasteActionCallback) {
         mUid = uid;
+        mDeviceId = deviceId;
         mContext = wrapContext(context, showInfo);
         mCallbackWrapper = callbackWrapper;
         mTransferTouchListener = transferTouchListener;
@@ -262,7 +264,7 @@ public final class RemoteSelectionToolbar {
                 if (tag instanceof ToolbarMenuItem toolbarMenuItem) {
                     if (toolbarMenuItem.itemId == R.id.paste
                             || toolbarMenuItem.itemId == R.id.pasteAsPlainText) {
-                        mOnPasteActionCallback.onPasteAction(mUid);
+                        mOnPasteActionCallback.onPasteAction(mUid, mDeviceId);
                     }
                     mCallbackWrapper.onMenuItemClicked(toolbarMenuItem.itemIndex);
                 }

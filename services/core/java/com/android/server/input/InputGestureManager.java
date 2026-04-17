@@ -86,7 +86,6 @@ final class InputGestureManager {
                     KeyEvent.META_CTRL_ON | KeyEvent.META_ALT_ON),
             createKeyTrigger(KeyEvent.KEYCODE_A, KeyEvent.META_CTRL_ON),
             createKeyTrigger(KeyEvent.KEYCODE_C, KeyEvent.META_CTRL_ON),
-            createKeyTrigger(KeyEvent.KEYCODE_V, KeyEvent.META_CTRL_ON),
             createKeyTrigger(KeyEvent.KEYCODE_X, KeyEvent.META_CTRL_ON),
             createKeyTrigger(KeyEvent.KEYCODE_Z, KeyEvent.META_CTRL_ON),
             createKeyTrigger(KeyEvent.KEYCODE_Y, KeyEvent.META_CTRL_ON)
@@ -363,6 +362,27 @@ final class InputGestureManager {
                             /* allowCaptureByFocusedWindow = */false
                     ));
         }
+        systemShortcuts.add(
+                createKeyGesture(
+                        KeyEvent.KEYCODE_V,
+                        KeyEvent.META_CTRL_ON,
+                        KeyGestureEvent.KEY_GESTURE_TYPE_PASTE,
+                        /* allowCaptureByFocusedWindow = */false
+                ));
+        systemShortcuts.add(
+                createKeyGesture(
+                        KeyEvent.KEYCODE_INSERT,
+                        KeyEvent.META_SHIFT_ON,
+                        KeyGestureEvent.KEY_GESTURE_TYPE_PASTE,
+                        /* allowCaptureByFocusedWindow = */false
+                ));
+        systemShortcuts.add(
+                createKeyGesture(
+                        KeyEvent.KEYCODE_V,
+                        KeyEvent.META_CTRL_ON | KeyEvent.META_SHIFT_ON,
+                        KeyGestureEvent.KEY_GESTURE_TYPE_PASTE_AS_PLAIN_TEXT,
+                        /* allowCaptureByFocusedWindow = */false
+                ));
         synchronized (mGestureLock) {
             for (InputGestureData systemShortcut : systemShortcuts) {
                 mSystemShortcuts.put(systemShortcut.getTrigger(), systemShortcut);

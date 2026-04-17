@@ -208,6 +208,8 @@ import com.android.server.accessibility.magnification.MagnificationConnectionMan
 import com.android.server.accessibility.magnification.MagnificationController;
 import com.android.server.accessibility.magnification.MagnificationProcessor;
 import com.android.server.accessibility.magnification.MagnificationScaleProvider;
+import com.android.server.clipboard.ClipboardManagerInternal;
+import com.android.server.companion.virtual.VirtualDeviceManagerInternal;
 import com.android.server.inputmethod.InputMethodManagerInternal;
 import com.android.server.pm.UserManagerInternal;
 import com.android.server.policy.WindowManagerPolicy;
@@ -425,6 +427,10 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
     boolean mInputSessionRequested;
     private SparseArray<SurfaceControl> mA11yOverlayLayers = new SparseArray<>();
     private ComponentName mTrustedAccessibilityServiceForTesting = null;
+
+    @GuardedBy("mLock")
+    @Nullable
+    private ClipboardManagerInternal.PasteGrant mLastPasteGrant;
 
     private final FlashNotificationsController mFlashNotificationsController;
     private final HearingDevicePhoneCallNotificationController mHearingDeviceNotificationController;
@@ -2279,6 +2285,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
         );
 
         synchronized (mLock) {
+            revokeLastPasteGrantLocked();
             // Disconnect from services for the old user.
             AccessibilityUserState oldUserState = getCurrentUserStateLocked();
             oldUserState.onSwitchToAnotherUserLocked();
@@ -6572,6 +6579,76 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
     }
 
     @Override
+    public void onPasteAction(AbstractAccessibilityServiceConnection connection, int callingUid,
+            int userId, int windowId) {
+        if (!(connection instanceof AccessibilityServiceConnection)
+                || (connection instanceof ProxyAccessibilityServiceConnection)) {
+            if (DEBUG) {
+                Slog.d(LOG_TAG, "The connection should be a real connection but was "
+                        + connection);
+            }
+            return;
+        }
+        AccessibilityServiceConnection realConnection = (AccessibilityServiceConnection) connection;
+
+        synchronized (mLock) {
+            final AccessibilityUserState userState = getCurrentUserStateLocked();
+            if (realConnection.mUserId != userId
+                    || realConnection.getClientUid() != callingUid
+                    || !userState.mBoundServices.contains(realConnection)) {
+                return;
+            }
+
+            final var targetConnection = mA11yWindowManager.getConnectionLocked(userId, windowId);
+            if (targetConnection == null) {
+                return;
+            }
+
+            final AccessibilityWindowInfo targetWindowInfo =
+                    mA11yWindowManager.findA11yWindowInfoByIdLocked(windowId);
+            final String targetPackageName = targetConnection.getPackageName();
+            final int targetUid = targetConnection.getUid();
+            if (targetWindowInfo == null
+                    || TextUtils.isEmpty(targetPackageName)
+                    || targetUid < 0) {
+                return;
+            }
+
+            final int targetDisplayId = targetWindowInfo.getDisplayId();
+            if (targetDisplayId == INVALID_DISPLAY) {
+                return;
+            }
+
+            final int focusedWindowId = mA11yWindowManager.getFocusedWindowId(
+                    AccessibilityNodeInfo.FOCUS_INPUT, targetDisplayId);
+            if (focusedWindowId != windowId) {
+                return;
+            }
+
+            final var cmi = LocalServices.getService(ClipboardManagerInternal.class);
+            if (cmi == null) {
+                return;
+            }
+
+            final var vdmi = LocalServices.getService(VirtualDeviceManagerInternal.class);
+            final int targetDeviceId = vdmi == null
+                    ? DEVICE_ID_DEFAULT
+                    : vdmi.getDeviceIdForDisplayId(targetDisplayId);
+
+            revokeLastPasteGrantLocked();
+            mLastPasteGrant = cmi.createPasteGrant(targetUid, targetDeviceId);
+        }
+    }
+
+    @GuardedBy("mLock")
+    private void revokeLastPasteGrantLocked() {
+        if (mLastPasteGrant != null) {
+            mLastPasteGrant.revoke();
+            mLastPasteGrant = null;
+        }
+    }
+
+    @Override
     public void requestImeLocked(AbstractAccessibilityServiceConnection connection) {
         if (!(connection instanceof AccessibilityServiceConnection)
                 || (connection instanceof ProxyAccessibilityServiceConnection)) {
@@ -6689,6 +6766,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
 
     private void unbindInput() {
         synchronized (mLock) {
+            revokeLastPasteGrantLocked();
             mInputBound = false;
             AccessibilityUserState userState = getCurrentUserStateLocked();
             for (int i = userState.mBoundServices.size() - 1; i >= 0; i--) {
@@ -6712,6 +6790,7 @@ public class AccessibilityManagerService extends IAccessibilityManager.Stub
     private void startInput(IRemoteAccessibilityInputConnection connection, EditorInfo editorInfo,
             boolean restarting) {
         synchronized (mLock) {
+            revokeLastPasteGrantLocked();
             // Keep records of these in case new Accessibility Services are enabled.
             mRemoteInputConnection = connection;
             mEditorInfo = editorInfo;

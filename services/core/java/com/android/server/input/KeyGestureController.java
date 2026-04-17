@@ -885,6 +885,14 @@ final class KeyGestureController {
                     }
                 }
                 return true;
+            case KeyEvent.KEYCODE_PASTE:
+                if (firstDown) {
+                    handleKeyGesture(deviceId, new int[]{keyCode}, /* modifierState = */0,
+                            KeyGestureEvent.KEY_GESTURE_TYPE_PASTE,
+                            KeyGestureEvent.ACTION_GESTURE_COMPLETE, displayId,
+                            focusedToken, /* flags = */0, /* appLaunchData = */null);
+                }
+                return true;
         }
 
         return mWindowManagerCallbacks.interceptKeyBeforeDispatching(focusedToken, event);

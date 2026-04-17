@@ -474,4 +474,22 @@ public final class InputMethodPrivilegedOperations {
             throw e.rethrowFromSystemServer();
         }
     }
+
+    /**
+     * Calls {@link IInputMethodPrivilegedOperations#onPasteAction(IBinder, AndroidFuture)}.
+     */
+    @AnyThread
+    public void onPasteAction(@NonNull IBinder startInputToken) {
+        final IInputMethodPrivilegedOperations ops = mOps.getAndWarnIfNull();
+        if (ops == null) {
+            return;
+        }
+        try {
+            final AndroidFuture<Void> future = new AndroidFuture<>();
+            ops.onPasteAction(startInputToken, future);
+            CompletableFutureUtil.getResult(future);
+        } catch (RemoteException e) {
+            throw e.rethrowFromSystemServer();
+        }
+    }
 }

@@ -79,10 +79,10 @@ public class SelectionToolbarManagerService extends SystemService {
     private class Stub extends ISelectionToolbarManager.Stub {
 
         @Override
-        public void showToolbar(ShowInfo showInfo,
+        public void showToolbar(int deviceId, ShowInfo showInfo,
                 ISelectionToolbarCallback iSelectionToolbarCallback) {
             mRemoteRenderServiceConnector
-                    .showToolbar(Binder.getCallingUid(), showInfo, iSelectionToolbarCallback);
+                    .showToolbar(Binder.getCallingUid(), deviceId, showInfo, iSelectionToolbarCallback);
         }
 
         @Override
@@ -106,8 +106,9 @@ public class SelectionToolbarManagerService extends SystemService {
         }
 
         @Override
-        public void onPasteAction(int uid) {
+        public void onPasteAction(int uid, int deviceId) {
             mClipboardManagerInternal.notifyUserAuthorizedClipAccess(uid);
+            mClipboardManagerInternal.createPasteGrant(uid, deviceId);
         }
     }
 
@@ -140,9 +141,9 @@ public class SelectionToolbarManagerService extends SystemService {
             }
         }
 
-        private void showToolbar(int uid, ShowInfo showInfo,
+        private void showToolbar(int uid, int deviceId, ShowInfo showInfo,
                 ISelectionToolbarCallback callback) {
-            run(s -> s.onShow(uid, showInfo, callback));
+            run(s -> s.onShow(uid, deviceId, showInfo, callback));
         }
 
         private void hideToolbar(int uid) {

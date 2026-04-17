@@ -348,6 +348,8 @@ public abstract class InputMethodManagerInternal {
     public abstract IRemoteComputerControlInputConnection getComputerControlInputConnection(
             @UserIdInt int userId, int displayId);
 
+    public abstract void onSystemPasteShortcut(@Nullable IBinder targetInputToken, int actionId);
+
     /**
      * Fake implementation of {@link InputMethodManagerInternal}. All the methods do nothing.
      */
@@ -478,6 +480,10 @@ public abstract class InputMethodManagerInternal {
                 public IRemoteComputerControlInputConnection getComputerControlInputConnection(
                         @UserIdInt int userId,  int displayId) {
                     return null;
+                }
+
+                @Override
+                public void onSystemPasteShortcut(@Nullable IBinder targetInputToken, int actionId) {
                 }
             };
 

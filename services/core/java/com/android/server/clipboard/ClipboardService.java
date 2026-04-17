@@ -199,6 +199,21 @@ public class ClipboardService extends SystemService {
 
     private final Object mLock = new Object();
 
+    private final ClipboardAccess.Injector mAccessInjector = new ClipboardAccess.Injector() {
+        @Nullable
+        @Override
+        public Clipboard getClipboardLocked(int userId, int deviceId) {
+            return ClipboardService.this.getClipboardLocked(userId, deviceId);
+        }
+
+        @Override
+        public int getIntendingDeviceId(int requestedDeviceId, int uid) {
+            return ClipboardService.this.getIntendingDeviceId(requestedDeviceId, uid);
+        }
+    };
+
+    private final ClipboardAccess mAccess;
+
     /**
      * Instantiates the clipboard.
      */
@@ -245,6 +260,8 @@ public class ClipboardService extends SystemService {
         HandlerThread workerThread = new HandlerThread(TAG);
         workerThread.start();
         mWorkerHandler = workerThread.getThreadHandler();
+
+        mAccess = new ClipboardAccess(getContext(), mWorkerHandler, mLock, mAccessInjector);
     }
 
     @Override
@@ -305,9 +322,11 @@ public class ClipboardService extends SystemService {
         }
     }
 
-    private static class Clipboard {
+    static class Clipboard {
         public final int userId;
         public final int deviceId;
+
+        int generation = 0;
 
         final RemoteCallbackList<IOnPrimaryClipChangedListener> primaryClipListeners
                 = new RemoteCallbackList<IOnPrimaryClipChangedListener>();
@@ -681,6 +700,12 @@ public class ClipboardService extends SystemService {
                 return null;
             }
             synchronized (mLock) {
+                final boolean hasFullReadAccess = mAccess.clipboardReadAllowedLocked(
+                        pkg, intendingUid, intendingUserId, intendingDeviceId);
+                if (!hasFullReadAccess) {
+                    return null;
+                }
+
                 try {
                     addActiveOwnerLocked(intendingUid, intendingDeviceId, pkg);
                 } catch (SecurityException e) {
@@ -724,9 +749,15 @@ public class ClipboardService extends SystemService {
                 return null;
             }
             synchronized (mLock) {
+                final boolean hasFullReadAccess = mAccess.clipboardReadAllowedLocked(
+                        callingPackage, intendingUid, intendingUserId, intendingDeviceId);
                 Clipboard clipboard = getClipboardLocked(intendingUserId, intendingDeviceId);
-                return (clipboard != null && clipboard.primaryClip != null)
+                ClipDescription description = (clipboard != null && clipboard.primaryClip != null)
                         ? clipboard.primaryClip.getDescription() : null;
+                if (description == null) {
+                    return null;
+                }
+                return hasFullReadAccess ? description : new ClipDescription(description);
             }
         }
 
@@ -823,7 +854,15 @@ public class ClipboardService extends SystemService {
                 return false;
             }
             synchronized (mLock) {
+                final boolean hasFullReadAccess = mAccess.clipboardReadAllowedLocked(
+                        callingPackage, intendingUid, intendingUserId, intendingDeviceId);
                 Clipboard clipboard = getClipboardLocked(intendingUserId, intendingDeviceId);
+                if (!hasFullReadAccess) {
+                    // Some apps may hide the paste button from the system toolbar when this returns
+                    // false, so report text if a clip exists even when secure clipboard blocks
+                    // inspecting its content.
+                    return clipboard != null && clipboard.primaryClip != null;
+                }
                 if (clipboard != null && clipboard.primaryClip != null) {
                     CharSequence text = clipboard.primaryClip.getItemAt(0).getText();
                     return text != null && text.length() > 0;
@@ -848,7 +887,11 @@ public class ClipboardService extends SystemService {
                             intendingUserId,
                             intendingDeviceId,
                             false)
-                    || isDeviceLocked(intendingUserId, deviceId)) {
+                    || isDeviceLocked(intendingUserId, deviceId)
+                    || !mAccess.clipboardReadAllowedForPackage(
+                            callingPackage,
+                            intendingUid,
+                            intendingUserId)) {
                 return null;
             }
             synchronized (mLock) {
@@ -915,6 +958,17 @@ public class ClipboardService extends SystemService {
                     }
                 }
             }
+        }
+
+        @Nullable
+        @Override
+        public PasteGrant createPasteGrant(int uid, int deviceId) {
+            return mAccess.createPasteGrant(uid, deviceId);
+        }
+
+        @Override
+        public void revokePasteGrant(int uid) {
+            mAccess.revokePasteGrant(uid);
         }
     }
 
@@ -1071,6 +1125,7 @@ public class ClipboardService extends SystemService {
             return;
         }
         clipboard.primaryClip = clip;
+        clipboard.generation++;
         clipboard.mNotifiedUids.clear();
         clipboard.mNotifiedTextClassifierUids.clear();
         if (clip != null) {
@@ -1099,12 +1154,16 @@ public class ClipboardService extends SystemService {
                             clipboard.primaryClipListeners.getBroadcastCookie(i);
 
                     if (clipboardAccessAllowed(
-                            AppOpsManager.OP_READ_CLIPBOARD,
-                            li.mPackageName,
-                            li.mAttributionTag,
-                            li.mUid,
-                            UserHandle.getUserId(li.mUid),
-                            clipboard.deviceId)) {
+                                    AppOpsManager.OP_READ_CLIPBOARD,
+                                    li.mPackageName,
+                                    li.mAttributionTag,
+                                    li.mUid,
+                                    UserHandle.getUserId(li.mUid),
+                                    clipboard.deviceId)
+                            && mAccess.clipboardReadAllowedForPackage(
+                                    li.mPackageName,
+                                    li.mUid,
+                                    UserHandle.getUserId(li.mUid))) {
                         clipboard.primaryClipListeners.getBroadcastItem(i)
                                 .dispatchPrimaryClipChanged();
                     }

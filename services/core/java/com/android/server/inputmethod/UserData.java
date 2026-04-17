@@ -19,6 +19,7 @@ package com.android.server.inputmethod;
 import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.UserIdInt;
+import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Pair;
 import android.util.SparseArray;
@@ -31,6 +32,7 @@ import com.android.internal.inputmethod.IRemoteAccessibilityInputConnection;
 import com.android.internal.inputmethod.IRemoteComputerControlInputConnection;
 import com.android.internal.inputmethod.IRemoteInputConnection;
 import com.android.internal.inputmethod.InputMethodSubtypeHandle;
+import com.android.server.clipboard.ClipboardManagerInternal;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -130,6 +132,20 @@ final class UserData {
     @GuardedBy("ImfLock.class")
     @Nullable
     EditorInfo mCurEditorInfo;
+
+    /**
+     * The startInput token associated with the current input session.
+     */
+    @GuardedBy("ImfLock.class")
+    @Nullable
+    IBinder mCurStartInputToken;
+
+    /**
+     * Last clipboard grant created through IMMS.
+     */
+    @GuardedBy("ImfLock.class")
+    @Nullable
+    ClipboardManagerInternal.PasteGrant mLastPasteGrant;
 
     /**
      * The token tracking the current IME show request that is waiting for a connection to an

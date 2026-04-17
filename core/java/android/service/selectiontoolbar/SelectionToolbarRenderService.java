@@ -86,7 +86,7 @@ public abstract class SelectionToolbarRenderService extends Service {
                 }
 
                 @Override
-                public void onShow(int uid, ShowInfo showInfo,
+                public void onShow(int uid, int deviceId, ShowInfo showInfo,
                         ISelectionToolbarCallback callback) {
                     synchronized (mLock) {
                         RemoteCallbackWrapper remoteCallbackWrapper = mCache.get(uid);
@@ -107,7 +107,7 @@ public abstract class SelectionToolbarRenderService extends Service {
                                 return;
                             }
                         }
-                        SelectionToolbarRenderService.this.onShow(uid, showInfo,
+                        SelectionToolbarRenderService.this.onShow(uid, deviceId, showInfo,
                                 remoteCallbackWrapper);
                     }
                 }
@@ -162,14 +162,14 @@ public abstract class SelectionToolbarRenderService extends Service {
         }
     }
 
-    protected void onPasteAction(int uid) {
+    protected void onPasteAction(int uid, int deviceId) {
         final ISelectionToolbarRenderServiceCallback callback = mServiceCallback;
         if (callback == null) {
             Log.e(TAG, "onPasteAction(): no server callback");
             return;
         }
         try {
-            callback.onPasteAction(uid);
+            callback.onPasteAction(uid, deviceId);
         } catch (RemoteException e) {
             Log.e(TAG, "Failed to notify onPasteAction", e);
         }
@@ -179,7 +179,7 @@ public abstract class SelectionToolbarRenderService extends Service {
      * Called when showing the selection toolbar.
      */
     @GuardedBy("mLock")
-    public abstract void onShow(int uid, ShowInfo showInfo,
+    public abstract void onShow(int uid, int deviceId, ShowInfo showInfo,
             RemoteCallbackWrapper callbackWrapper);
 
     /**
@@ -274,6 +274,6 @@ public abstract class SelectionToolbarRenderService extends Service {
         /**
          * Notify the service to the paste action.
          */
-        void onPasteAction(int uid);
+        void onPasteAction(int uid, int deviceId);
     }
 }

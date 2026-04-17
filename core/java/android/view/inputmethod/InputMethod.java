@@ -445,4 +445,11 @@ public interface InputMethod {
     default void setStylusWindowIdleTimeoutForTest(@DurationMillisLong long timeout) {
         // intentionally empty
     }
+
+    /**
+     * @hide
+     */
+    default void performContextMenuAction(int id) {
+        // intentionally empty
+    }
 }

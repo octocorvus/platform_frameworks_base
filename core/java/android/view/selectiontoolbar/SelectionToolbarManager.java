@@ -34,9 +34,12 @@ import java.util.Objects;
 @SystemService(Context.SELECTION_TOOLBAR_SERVICE)
 public final class SelectionToolbarManager {
 
+    private final Context mContext;
     private final ISelectionToolbarManager mService;
 
-    public SelectionToolbarManager(@NonNull ISelectionToolbarManager service) {
+    public SelectionToolbarManager(@NonNull Context context,
+            @NonNull ISelectionToolbarManager service) {
+        mContext = context;
         mService = service;
     }
 
@@ -48,7 +51,7 @@ public final class SelectionToolbarManager {
         try {
             Objects.requireNonNull(showInfo);
             Objects.requireNonNull(callback);
-            mService.showToolbar(showInfo, callback);
+            mService.showToolbar(mContext.getDeviceId(), showInfo, callback);
         } catch (RemoteException e) {
             throw e.rethrowFromSystemServer();
         }

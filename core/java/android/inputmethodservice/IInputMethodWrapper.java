@@ -88,6 +88,7 @@ class IInputMethodWrapper extends IInputMethod.Stub
     private static final int DO_SET_STYLUS_WINDOW_IDLE_TIMEOUT = 160;
     private static final int DO_COMMIT_HANDWRITING_DELEGATION_TEXT_IF_AVAILABLE = 170;
     private static final int DO_DISCARD_HANDWRITING_DELEGATION_TEXT = 180;
+    private static final int DO_PERFORM_CONTEXT_MENU_ACTION = 190;
 
     final WeakReference<InputMethodServiceInternal> mTarget;
     final Context mContext;
@@ -324,6 +325,12 @@ class IInputMethodWrapper extends IInputMethod.Stub
                 }
                 return;
             }
+            case DO_PERFORM_CONTEXT_MENU_ACTION: {
+                if (isValid(inputMethod, target, "DO_PERFORM_CONTEXT_MENU_ACTION")) {
+                    inputMethod.performContextMenuAction(msg.arg1);
+                }
+                return;
+            }
         }
         Log.w(TAG, "Unhandled message code: " + msg.what);
     }
@@ -531,6 +538,12 @@ class IInputMethodWrapper extends IInputMethod.Stub
     public void setStylusWindowIdleTimeoutForTest(@DurationMillisLong long timeout) {
         mCaller.executeOrSendMessage(
                 mCaller.obtainMessageO(DO_SET_STYLUS_WINDOW_IDLE_TIMEOUT, timeout));
+    }
+
+    @BinderThread
+    @Override
+    public void performContextMenuAction(int id) {
+        mCaller.executeOrSendMessage(mCaller.obtainMessageI(DO_PERFORM_CONTEXT_MENU_ACTION, id));
     }
 
     private static boolean isValid(InputMethod inputMethod, InputMethodServiceInternal target,

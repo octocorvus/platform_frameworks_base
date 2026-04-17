@@ -29,7 +29,7 @@ class SysUiSelectionToolbarRenderService : SelectionToolbarRenderService() {
     // Only show one toolbar, dismiss the old ones and remove from cache
     private val toolbarCache = mutableMapOf<Int, RemoteSelectionToolbar>()
 
-    override fun onShow(uid: Int, showInfo: ShowInfo, callbackWrapper: RemoteCallbackWrapper) {
+    override fun onShow(uid: Int, deviceId: Int, showInfo: ShowInfo, callbackWrapper: RemoteCallbackWrapper) {
         val existingToolbar = toolbarCache[uid]
         // Only allow one package to create one toolbar
         if (existingToolbar != null) {
@@ -40,6 +40,7 @@ class SysUiSelectionToolbarRenderService : SelectionToolbarRenderService() {
         val toolbar =
             RemoteSelectionToolbar(
                 uid,
+                deviceId,
                 this,
                 showInfo,
                 callbackWrapper,

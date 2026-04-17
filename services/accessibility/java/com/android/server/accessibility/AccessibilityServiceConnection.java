@@ -863,7 +863,7 @@ class AccessibilityServiceConnection extends AbstractAccessibilityServiceConnect
         }
     }
 
-    private int getClientUid() {
+    int getClientUid() {
         ResolveInfo resolveInfo = mAccessibilityServiceInfo.getResolveInfo();
         if (resolveInfo != null && resolveInfo.serviceInfo != null
                 && resolveInfo.serviceInfo.applicationInfo != null) {
