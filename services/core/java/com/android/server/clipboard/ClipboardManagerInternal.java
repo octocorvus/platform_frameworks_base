@@ -27,5 +27,7 @@ public interface ClipboardManagerInternal {
      *
      * @param uid The uid expected to access clip data.
      */
-    void notifyUserAuthorizedClipAccess(int uid);
+    void notifyUserAuthorizedClipAccess(int uid, int deviceId);
+
+    void notifySystemSelectionToolbarClientUidDied(int uid);
 }

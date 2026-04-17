@@ -199,6 +199,8 @@ public class ClipboardService extends SystemService {
 
     private final Object mLock = new Object();
 
+    private final ClipboardHooks mHooks;
+
     /**
      * Instantiates the clipboard.
      */
@@ -245,6 +247,8 @@ public class ClipboardService extends SystemService {
         HandlerThread workerThread = new HandlerThread(TAG);
         workerThread.start();
         mWorkerHandler = workerThread.getThreadHandler();
+
+        mHooks = new ClipboardHooks(getContext());
     }
 
     @Override
@@ -305,9 +309,11 @@ public class ClipboardService extends SystemService {
         }
     }
 
-    private static class Clipboard {
+    static class Clipboard {
         public final int userId;
         public final int deviceId;
+
+        int generation = 0;
 
         final RemoteCallbackList<IOnPrimaryClipChangedListener> primaryClipListeners
                 = new RemoteCallbackList<IOnPrimaryClipChangedListener>();
@@ -667,6 +673,7 @@ public class ClipboardService extends SystemService {
         @Override
         public ClipData getPrimaryClip(
                 String pkg, String attributionTag, @UserIdInt int userId, int deviceId) {
+            long elapsedRealtime = SystemClock.elapsedRealtime();
             final int intendingUid = getIntendingUid(pkg, userId);
             final int intendingUserId = UserHandle.getUserId(intendingUid);
             final int intendingDeviceId = getIntendingDeviceId(deviceId, intendingUid);
@@ -681,6 +688,12 @@ public class ClipboardService extends SystemService {
                 return null;
             }
             synchronized (mLock) {
+                Clipboard clipboard = getClipboardLocked(intendingUserId, intendingDeviceId);
+                if (!mHooks.isClipboardReadAllowedLocked(pkg, intendingUid, intendingUserId,
+                        elapsedRealtime, clipboard)) {
+                    return null;
+                }
+
                 try {
                     addActiveOwnerLocked(intendingUid, intendingDeviceId, pkg);
                 } catch (SecurityException e) {
@@ -690,7 +703,6 @@ public class ClipboardService extends SystemService {
                     return null;
                 }
 
-                Clipboard clipboard = getClipboardLocked(intendingUserId, intendingDeviceId);
                 if (clipboard == null) {
                     return null;
                 }
@@ -895,15 +907,24 @@ public class ClipboardService extends SystemService {
     private class ClipboardInternalImpl implements ClipboardManagerInternal {
 
         @Override
-        public void notifyUserAuthorizedClipAccess(int uid) {
+        public void notifyUserAuthorizedClipAccess(int uid, int deviceId) {
             long elapsedRealtime = SystemClock.elapsedRealtime();
+            int intendingDeviceId = getIntendingDeviceId(deviceId, uid);
+            if (intendingDeviceId == DEVICE_ID_INVALID) {
+                return;
+            }
             synchronized (mLock) {
                 mSuppressAccessNotification.put(uid,
                         elapsedRealtime + ACCESS_NOTIFICATION_SUPPRESSION_TIMEOUT_MILLIS);
+                mHooks.onUserAuthorizedClipAccessLocked(uid, intendingDeviceId, elapsedRealtime,
+                        getClipboardLocked(UserHandle.getUserId(uid), intendingDeviceId));
             }
             mWorkerHandler.postDelayed(PooledLambda.obtainRunnable(
                             ClipboardInternalImpl::pruneExpiredNotificationSuppressionUids, this),
                     ACCESS_NOTIFICATION_SUPPRESSION_TIMEOUT_MILLIS + 1);
+            mWorkerHandler.postDelayed(PooledLambda.obtainRunnable(
+                            ClipboardInternalImpl::pruneExpiredPasteActions, this),
+                    ClipboardHooks.PENDING_PASTE_TIMEOUT_MILLIS + 1);
         }
 
         private void pruneExpiredNotificationSuppressionUids() {
@@ -914,6 +935,20 @@ public class ClipboardService extends SystemService {
                         mSuppressAccessNotification.removeAt(i);
                     }
                 }
+            }
+        }
+
+        private void pruneExpiredPasteActions() {
+            long elapsedRealtime = SystemClock.elapsedRealtime();
+            synchronized (mLock) {
+                mHooks.pruneExpiredPasteActionsLocked(elapsedRealtime);
+            }
+        }
+
+        @Override
+        public void notifySystemSelectionToolbarClientUidDied(int uid) {
+            synchronized (mLock) {
+                mHooks.onSystemSelectionToolbarClientUidDiedLocked(uid);
             }
         }
     }
@@ -1071,6 +1106,7 @@ public class ClipboardService extends SystemService {
             return;
         }
         clipboard.primaryClip = clip;
+        clipboard.generation++;
         clipboard.mNotifiedUids.clear();
         clipboard.mNotifiedTextClassifierUids.clear();
         if (clip != null) {
@@ -1105,8 +1141,11 @@ public class ClipboardService extends SystemService {
                             li.mUid,
                             UserHandle.getUserId(li.mUid),
                             clipboard.deviceId)) {
-                        clipboard.primaryClipListeners.getBroadcastItem(i)
-                                .dispatchPrimaryClipChanged();
+                        if (mHooks.isClipboardReadAllowedForPackage(li.mPackageName, li.mUid,
+                                UserHandle.getUserId(li.mUid))) {
+                            clipboard.primaryClipListeners.getBroadcastItem(i)
+                                    .dispatchPrimaryClipChanged();
+                        }
                     }
                 } catch (RemoteException | SecurityException e) {
                     // The RemoteCallbackList will take care of removing

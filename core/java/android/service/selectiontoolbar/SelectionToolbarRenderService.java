@@ -87,7 +87,7 @@ public abstract class SelectionToolbarRenderService extends Service {
 
                 @Override
                 public void onShow(int uid, ShowInfo showInfo,
-                        ISelectionToolbarCallback callback) {
+                        ISelectionToolbarCallback callback, int deviceId) {
                     synchronized (mLock) {
                         RemoteCallbackWrapper remoteCallbackWrapper = mCache.get(uid);
                         if (remoteCallbackWrapper == null) {
@@ -108,7 +108,7 @@ public abstract class SelectionToolbarRenderService extends Service {
                             }
                         }
                         SelectionToolbarRenderService.this.onShow(uid, showInfo,
-                                remoteCallbackWrapper);
+                                remoteCallbackWrapper, deviceId);
                     }
                 }
 
@@ -136,6 +136,7 @@ public abstract class SelectionToolbarRenderService extends Service {
                     synchronized (mLock) {
                         SelectionToolbarRenderService.this.onUidDied(uid);
                     }
+                    SelectionToolbarRenderService.this.onClientUidDiedServiceCallback(uid);
                 }
             };
 
@@ -162,16 +163,29 @@ public abstract class SelectionToolbarRenderService extends Service {
         }
     }
 
-    protected void onPasteAction(int uid) {
+    protected void onPasteAction(int uid, int deviceId) {
         final ISelectionToolbarRenderServiceCallback callback = mServiceCallback;
         if (callback == null) {
             Log.e(TAG, "onPasteAction(): no server callback");
             return;
         }
         try {
-            callback.onPasteAction(uid);
+            callback.onPasteAction(uid, deviceId);
         } catch (RemoteException e) {
             Log.e(TAG, "Failed to notify onPasteAction", e);
+        }
+    }
+
+    private void onClientUidDiedServiceCallback(int uid) {
+        final ISelectionToolbarRenderServiceCallback callback = mServiceCallback;
+        if (callback == null) {
+            Log.e(TAG, "onClientUidDied(): no server callback");
+            return;
+        }
+        try {
+            callback.onClientUidDied(uid);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Failed to notify onClientUidDied", e);
         }
     }
 
@@ -180,7 +194,7 @@ public abstract class SelectionToolbarRenderService extends Service {
      */
     @GuardedBy("mLock")
     public abstract void onShow(int uid, ShowInfo showInfo,
-            RemoteCallbackWrapper callbackWrapper);
+            RemoteCallbackWrapper callbackWrapper, int deviceId);
 
     /**
      * Called when hiding the selection toolbar.
@@ -274,6 +288,6 @@ public abstract class SelectionToolbarRenderService extends Service {
         /**
          * Notify the service to the paste action.
          */
-        void onPasteAction(int uid);
+        void onPasteAction(int uid, int deviceId);
     }
 }
